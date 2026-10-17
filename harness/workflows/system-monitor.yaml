@@ -1,0 +1,14 @@
+# System Monitor workflow
+name: system-monitor
+description: Check local system health and surface anomalies
+agent: simple
+tools:
+  - terminal
+  - file_read
+steps:
+  - check_cpu_memory
+  - check_disk
+  - check_running_services
+  - summarize_status
+output: health_report
+evidence: true
