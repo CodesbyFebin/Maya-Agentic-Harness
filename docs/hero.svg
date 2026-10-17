@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400">
+  <rect width="1200" height="400" fill="#010409"/>
+  <circle cx="600" cy="160" r="100" fill="none" stroke="#00ff00" stroke-width="2" opacity="0.6"/>
+  <circle cx="600" cy="160" r="70" fill="none" stroke="#00e5ff" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="600" cy="160" r="30" fill="#00e5ff" opacity="0.9"/>
+  <text x="600" y="290" font-family="system-ui,sans-serif" font-size="64" fill="#00ff00" text-anchor="middle" font-weight="700">MAYA</text>
+  <text x="600" y="340" font-family="system-ui,sans-serif" font-size="28" fill="#00e5ff" text-anchor="middle">Agentic Harness</text>
+  <text x="600" y="375" font-family="system-ui,sans-serif" font-size="18" fill="#8b949e" text-anchor="middle">systems that prove what happened</text>
+</svg>
