@@ -12,37 +12,64 @@ Visual JARVIS-style dashboard that sits on top of an OpenJarvis-compatible (or a
 - **Local persistence** — tasks, memory notes, chat history, settings in localStorage
 - **Agentic direction** — structured for tools, workflows, memory indexing, and verifiable execution traces
 
-## Quick start (dashboard)
+## Quick start
 
+### Dashboard
 1. Open `dashboard/maya-command-center.html` in Chrome/Edge.
 2. Allow microphone if using voice.
-3. (Optional) Run a local agent backend:
 
+### Backend (choose one)
+**OpenJarvis (recommended):**
 ```bash
-# OpenJarvis (recommended)
 curl -fsSL https://open-jarvis.github.io/OpenJarvis/install.sh | bash
 jarvis serve --port 8000
 ```
 
+**Minimal stub:**
+```bash
+cd harness
+pip install fastapi uvicorn
+python backend_stub.py
+```
+
 Then in the dashboard Settings → set Backend URL → Save & Test.
 
-## Architecture sketch
+## Structure
+
+```
+README.md
+dashboard/
+  maya-command-center.html
+harness/
+  README.md
+  backend_stub.py
+  workflows/
+    morning-digest.yaml
+```
+
+## Architecture
 
 ```
 [ MAYA Dashboard (HTML/JS) ]
         ↔ Web Speech + localStorage
         ↔ /v1/chat/completions
-[ OpenJarvis / Ollama / any OpenAI-compatible engine ]
+[ OpenJarvis / Ollama / stub ]
         ↔ Agents · Tools · Memory · Traces
 ```
 
+OpenJarvis primitives (Intelligence, Engine, Agents, Tools & Memory, Learning) map cleanly onto the dashboard panels.
+
 ## Next
 
-- Wire real tool calls and agent loops
-- Memory indexing (OpenJarvis memory or local vector store)
-- Workflow playbooks
+- Full dashboard HTML (large file — push in follow-up or clone locally and copy)
+- Real tool calls and agent loops with evidence traces
+- Memory indexing
+- More workflow playbooks
 - Desktop packaging (Tauri)
-- Evidence / proof layer for tool executions
+
+## Visibility
+
+Repo is currently private. Change to public in GitHub Settings if desired.
 
 ## License
 
