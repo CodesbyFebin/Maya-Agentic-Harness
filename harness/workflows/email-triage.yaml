@@ -1,0 +1,16 @@
+# Email Triage workflow
+name: email-triage
+description: Scan inbox, categorize, and draft replies
+agent: orchestrator
+tools:
+  - email_list
+  - email_read
+  - email_draft
+steps:
+  - fetch_unread
+  - classify_priority
+  - summarize_threads
+  - draft_replies
+  - flag_for_review
+output: triage_summary
+evidence: true
