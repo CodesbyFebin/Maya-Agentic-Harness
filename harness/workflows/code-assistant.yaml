@@ -1,0 +1,16 @@
+# Code Assistant workflow
+name: code-assistant
+description: Write, review, and explain code with tool use
+agent: codeact
+tools:
+  - file_read
+  - file_write
+  - terminal
+  - code_search
+steps:
+  - understand_request
+  - explore_codebase
+  - plan_changes
+  - implement
+  - verify
+output: patch_or_explanation
