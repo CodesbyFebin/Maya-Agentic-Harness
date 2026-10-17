@@ -1,0 +1,14 @@
+# Morning Digest workflow (OpenJarvis-compatible style)
+name: morning-digest
+description: Daily briefing with calendar, email, and news
+agent: orchestrator
+tools:
+  - calendar
+  - email
+  - web_search
+steps:
+  - summarize_calendar
+  - check_inbox_highlights
+  - pull_news
+  - synthesize_brief
+output: spoken_summary
