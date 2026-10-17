@@ -1,0 +1,15 @@
+# File Organizer workflow
+name: file-organizer
+description: Sort, rename, and archive files by rules
+agent: codeact
+tools:
+  - filesystem
+  - terminal
+steps:
+  - scan_directory
+  - classify_files
+  - propose_moves
+  - execute_moves
+  - log_changes
+output: organization_report
+evidence: true
