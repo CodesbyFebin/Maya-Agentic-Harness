@@ -1,25 +1,14 @@
-# FreeLLMAPI Backend
+# MAYA Local Runtime
 
-FreeLLMAPI aggregates free LLM providers behind one OpenAI-compatible endpoint. It is an excellent backend for MAYA.
+MAYA runs a local agent runtime that records evidence traces.
 
-## Quick start
+## Start
 
 ```bash
-curl -fsSL https://freellmapi.co/install.sh | bash
-# or Docker
+cd harness
+python backend_stub.py
 ```
 
-Open http://localhost:3001, add provider keys, then set MAYA dashboard Settings backend to:
+Then open the dashboard and set the backend URL if needed.
 
-```
-http://localhost:3001
-```
-
-## Why it fits MAYA
-
-- Single `/v1/chat/completions` endpoint
-- Automatic failover across free tiers
-- Works with the evidence-trace loop in `harness/agent_loop.py`
-- No changes required to the dashboard
-
-Repo: https://github.com/tashfeenahmed/freellmapi
+All execution stays local and inspectable.
