@@ -1,0 +1,14 @@
+# News Brief workflow
+name: news-brief
+description: Pull and synthesize current news on a topic
+agent: react
+tools:
+  - web_search
+  - web_fetch
+steps:
+  - define_topics
+  - search_recent
+  - extract_headlines
+  - synthesize_brief
+output: spoken_or_text_brief
+evidence: true
