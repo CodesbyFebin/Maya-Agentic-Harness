@@ -1,24 +1,19 @@
 # MAYA Agent Harness
 
-Runtime side of MAYA. Works with FreeLLMAPI, OpenJarvis, or any OpenAI-compatible endpoint.
+Runtime side of MAYA. Local agent loop, tools, workflows, memory, and evidence traces.
 
 ## Current files
 
-- `agent_loop.py` — calls real backend and writes evidence traces
-- `backend_stub.py` — minimal FastAPI stub
-- `workflows/` — playbook YAMLs
+- `agent_loop.py` — agent runtime that writes evidence traces
+- `backend_stub.py` — minimal local server
+- `workflows/` — playbook definitions
 - `tools/` — filesystem and terminal wrappers
-- `memory/` — schema + SQLite helper
+- `memory/` — schema and store
 
-## Recommended backend: FreeLLMAPI
+## Run
 
 ```bash
-curl -fsSL https://freellmapi.co/install.sh | bash
-# dashboard backend → http://localhost:3001
-```
-
-Then test the loop:
-```bash
+python backend_stub.py
 python agent_loop.py "What is an agentic harness?"
 ```
 
