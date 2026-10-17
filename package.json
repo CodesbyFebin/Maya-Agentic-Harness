@@ -1,0 +1,29 @@
+{
+  "name": "maya-agentic-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MAYA Agentic Harness — local-first AI command center and agent runtime",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export"
+  },
+  "dependencies": {
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "keywords": [
+    "agentic-harness",
+    "ai-agents",
+    "openjarvis",
+    "local-llm",
+    "command-center",
+    "maya",
+    "evidence",
+    "self-hosted"
+  ],
+  "author": "CodesbyFebin",
+  "license": "Apache-2.0"
+}
