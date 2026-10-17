@@ -1,0 +1,17 @@
+# Deep Research workflow
+name: deep-research
+description: Multi-source research with synthesis and evidence tracking
+agent: react
+tools:
+  - web_search
+  - web_fetch
+  - memory_store
+  - evidence_log
+steps:
+  - clarify_query
+  - search_primary_sources
+  - extract_claims
+  - cross_reference
+  - synthesize_with_citations
+  - store_in_memory
+output: research_brief
