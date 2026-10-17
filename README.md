@@ -1,4 +1,5 @@
 # MAYA Agentic Harness
+<img width="2172" height="724" alt="MAYA cyberpunk banner with CodesbyFebin" src="https://github.com/user-attachments/assets/ec520038-10d0-4ba4-968f-ea976a1aa059" />
 
 ![MAYA Agentic Harness](docs/maya-readme-banner.png)
 
