@@ -1,0 +1,27 @@
+{
+  "name": "MAYA Agentic Harness",
+  "shortName": "MAYA",
+  "description": "Local-first personal AI command center and agentic harness for systems that prove what happened.",
+  "tagline": "systems that prove what happened",
+  "url": "https://codesbyfebin.github.io/Maya-Agentic-Harness/",
+  "github": "https://github.com/CodesbyFebin/Maya-Agentic-Harness",
+  "author": "CodesbyFebin",
+  "theme": {
+    "background": "#010409",
+    "accent": "#00ff00",
+    "cyan": "#00e5ff",
+    "danger": "#e85d4c"
+  },
+  "og": {
+    "title": "MAYA Agentic Harness — Local AI Command Center",
+    "description": "JARVIS-style dashboard + agent runtime for OpenJarvis and OpenAI-compatible backends. Voice, workflows, evidence traces.",
+    "image": "/og.png",
+    "type": "website"
+  },
+  "twitter": {
+    "card": "summary_large_image",
+    "site": "@Codesbyfebin",
+    "title": "MAYA Agentic Harness",
+    "description": "Local-first AI command center that proves what happened."
+  }
+}
