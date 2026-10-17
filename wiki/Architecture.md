@@ -2,7 +2,7 @@
 
 MAYA is split into two layers:
 
-1. **Dashboard** (HTML/JS) — voice, multi-view UI, localStorage persistence
+1. **Dashboard** (HTML/JS) — voice, multi-view UI, local persistence
 2. **Harness** (Python) — agent loop, tools, workflows, memory, evidence traces
 
 ## Data flow
@@ -11,19 +11,10 @@ MAYA is split into two layers:
 User (voice or text)
    ↓
 Dashboard
-   ↓  /v1/chat/completions
-Harness / OpenJarvis / Ollama
+   ↓
+MAYA Agent Runtime
    ↓
 Tools + Memory + Traces
 ```
 
-## OpenJarvis alignment
-
-MAYA maps to OpenJarvis primitives:
-- Intelligence → model routing
-- Engine → Ollama / vLLM
-- Agents → orchestrator, ReAct, CodeAct
-- Tools & Memory → local wrappers + SQLite
-- Learning → trace review
-
-See [OpenJarvis Integration](OpenJarvis-Integration).
+MAYA keeps the full execution path inspectable so the operator can verify what happened.
