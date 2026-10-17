@@ -25,6 +25,12 @@ harness/
     deep-research.yaml
     code-assistant.yaml
     system-monitor.yaml
+    email-triage.yaml
+    file-organizer.yaml
+    news-brief.yaml
+  tools/
+    filesystem.py          # path-restricted file ops
+    terminal.py            # allowlisted commands
   memory/
     schema.md
     sqlite_helper.py       # local SQLite memory
@@ -46,7 +52,7 @@ Then point the dashboard Settings at `http://localhost:8000`.
 
 ## Next steps
 
-- Wire agent_loop.py to a real LLM endpoint
-- Expand tool wrappers
-- Add more workflows
+- Wire agent_loop.py to a real LLM endpoint + the tool wrappers
+- Add more tools (web, email, calendar)
 - Evidence hash + proof layer
+- Sync memory between dashboard and SQLite
