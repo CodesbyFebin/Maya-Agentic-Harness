@@ -13,27 +13,40 @@ OpenJarvis provides the five primitives:
 
 MAYA dashboard talks to the OpenAI-compatible `/v1/chat/completions` endpoint exposed by `jarvis serve`.
 
-## Planned structure
+## Current files
 
 ```
 harness/
-  agents/          # agent definitions / prompts
-  tools/           # custom tool wrappers
-  workflows/       # playbook YAML or JSON
-  memory/          # memory schema notes
-  backend_stub/    # minimal FastAPI or Python example
+  README.md
+  backend_stub.py          # FastAPI OpenAI-compatible stub
+  agent_loop.py            # minimal loop that writes evidence traces
+  workflows/
+    morning-digest.yaml
+    deep-research.yaml
+    code-assistant.yaml
+    system-monitor.yaml
+  memory/
+    schema.md
+    sqlite_helper.py       # local SQLite memory
 ```
 
-## Quick local backend (OpenJarvis)
+## Quick local backend
 
+**OpenJarvis (recommended):**
 ```bash
 jarvis serve --port 8000 --engine ollama --model qwen3.5:4b --agent orchestrator
+```
+
+**Stub:**
+```bash
+python backend_stub.py
 ```
 
 Then point the dashboard Settings at `http://localhost:8000`.
 
 ## Next steps
 
-- Implement a thin Python agent loop that logs tool calls as evidence
-- Add workflow YAML for morning-digest, deep-research, code-assistant
-- Connect memory store
+- Wire agent_loop.py to a real LLM endpoint
+- Expand tool wrappers
+- Add more workflows
+- Evidence hash + proof layer
