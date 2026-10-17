@@ -1,6 +1,6 @@
 # MAYA Agentic Harness
 
-![MAYA Hero](docs/hero.svg)
+![MAYA Agentic Harness](docs/maya-readme-banner.png)
 
 **Local-first personal AI command center and agentic harness.**
 
