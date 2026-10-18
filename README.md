@@ -53,6 +53,14 @@ The visual identity uses a near-black background, phosphor green accents, and cy
 
 Future work includes richer tool wrappers, additional workflow playbooks, a more complete memory index, evidence hashing for stronger provenance, and packaging options for desktop use. The current design already supports these extensions because the evidence contract and the tool boundary are explicit. Operators can add new playbooks by writing YAML, add new tools by following the wrapper pattern, and inspect every run through the traces that are already produced.
 
+## Live dashboard events
+
+The local backend streams runtime activity to the dashboard at `/ws`. The stream sends a `runtime_snapshot` on connect, then `agent_event`, `tool_event`, and `task_update` messages as the agent loop runs. Each event has a monotonically increasing `seq` and UTC `timestamp`. The WebSocket accepts `{"type":"ping"}` and replies with `pong`; it does not accept commands that start agent work.
+
+The dashboard reconnects with bounded backoff and falls back to `GET /health` while the stream is unavailable. Tool events include the tool name, outcome, and round only. User prompts, tool arguments, file contents, and model responses are not broadcast over the event stream. WebSocket browser origins are checked against `MAYA_ALLOWED_ORIGINS`, the same comma-separated allowlist used for HTTP CORS.
+
+By default the backend allows `http://127.0.0.1:5500` and `http://localhost:5500`. When serving the dashboard from another origin, configure `MAYA_ALLOWED_ORIGINS` with the exact trusted origin(s), for example `MAYA_ALLOWED_ORIGINS=http://127.0.0.1:5500,https://your-dashboard.example`. Do not use a wildcard for a local agent endpoint.
+
 ## License
 
 Apache-2.0
