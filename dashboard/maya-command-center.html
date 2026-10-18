@@ -267,7 +267,7 @@
           type.className = "event-type";
           type.textContent = String(item.tool || item.event || item.type || "event");
           const state = document.createElement("span");
-          state.className = `event-state ${item.status === "error" || item.status === "denied" ? item.status : item.status === "ok" || item.status === "success" ? "success" : ""}`;
+          state.className = `event-state ${["error", "denied", "failed"].includes(item.status) ? (item.status === "failed" ? "error" : item.status) : item.status === "ok" || item.status === "success" ? "success" : ""}`;
           state.textContent = String(item.status || "recorded");
           const time = document.createElement("span");
           time.className = "event-time";
