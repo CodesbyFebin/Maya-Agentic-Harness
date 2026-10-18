@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.Y.A. — Agentic Harness v4.0</title>
+<style>
+:root {
+  --bg: #010409; --panel: #0d1117; --accent: #00ff00; --cyan: #00e5ff;
+  --text: #e6edf3; --muted: #8b949e; --danger: #e85d4c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+header { background: #000; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
+header h1 { color: var(--accent); font-size: 1.4rem; letter-spacing: 2px; }
+.nav { display: flex; gap: 0.5rem; }
+.nav button { background: transparent; color: var(--cyan); border: 1px solid #30363d; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; }
+.nav button.active { background: var(--accent); color: #000; }
+main { flex: 1; display: grid; grid-template-columns: 280px 1fr 320px; gap: 1rem; padding: 1rem; overflow: hidden; }
+.panel { background: var(--panel); border: 1px solid #21262d; border-radius: 8px; padding: 1rem; overflow-y: auto; }
+#chat { display: flex; flex-direction: column; }
+#messages { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
+.msg { margin: 0.5rem 0; padding: 0.6rem; border-radius: 6px; }
+.user { background: #161b22; align-self: flex-end; }
+.assistant { background: #0d1117; border-left: 3px solid var(--accent); }
+.input-row { display: flex; gap: 0.5rem; }
+input, textarea { background: #0d1117; border: 1px solid #30363d; color: var(--text); padding: 0.6rem; border-radius: 4px; flex: 1; }
+button.primary { background: var(--accent); color: #000; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.status { font-size: 0.8rem; color: var(--muted); }
+#core { text-align: center; }
+.globe { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, var(--cyan), transparent); margin: 1rem auto; animation: pulse 3s infinite; }
+@keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>M.A.Y.A.</h1>
+  <div class="nav" id="nav">
+    <button class="active" data-view="center">Command</button>
+    <button data-view="agents">Agents</button>
+    <button data-view="tasks">Tasks</button>
+    <button data-view="memory">Memory</button>
+    <button data-view="workflows">Workflows</button>
+    <button data-view="settings">Settings</button>
+  </div>
+  <span class="status" id="backendStatus">MAYA API: checking…</span>
+</header>
+<main>
+  <div class="panel" id="left">
+    <h3>System</h3>
+    <div id="core"><div class="globe"></div><p>AI Core</p></div>
+    <p class="status">Voice: <span id="voiceStatus">idle</span></p>
+    <button id="micBtn" class="primary" style="width:100%;margin-top:1rem;">Hold to Speak</button>
+  </div>
+  <div class="panel" id="chat">
+    <div id="messages"></div>
+    <div class="input-row">
+      <input id="input" placeholder="Speak or type to MAYA..." />
+      <button id="send" class="primary">Send</button>
+    </div>
+  </div>
+  <div class="panel" id="right">
+    <h3>Live Feed</h3>
+    <div id="feed" class="status">Waiting for activity...</div>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const LOCAL_BACKEND = 'http://127.0.0.1:8001';
+const isLocalDashboard = location.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(location.hostname);
+function normalizeBackend(value) {
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return '';
+    return url.origin;
+  } catch { return ''; }
+}
+let savedBackend = '';
+try { savedBackend = localStorage.getItem('maya_backend') || ''; } catch { /* storage may be unavailable */ }
+if (savedBackend === 'http://localhost:3001') {
+  savedBackend = LOCAL_BACKEND;
+  try { localStorage.setItem('maya_backend', savedBackend); } catch { /* session still uses the corrected default */ }
+}
+let backend = normalizeBackend(savedBackend) || (isLocalDashboard ? LOCAL_BACKEND : '');
+let history = JSON.parse(localStorage.getItem('maya_history') || '[]');
+
+function saveHistory() { localStorage.setItem('maya_history', JSON.stringify(history.slice(-50))); }
+
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.textContent = text;
+  $('#messages').appendChild(div);
+  $('#messages').scrollTop = $('#messages').scrollHeight;
+  history.push({role, content: text});
+  saveHistory();
+}
+
+function logFeed(msg) {
+  const p = document.createElement('p');
+  p.textContent = new Date().toLocaleTimeString() + ' ' + msg;
+  $('#feed').prepend(p);
+}
+
+async function send(text) {
+  if (!text.trim()) return;
+  if (!backend) {
+    logFeed('Backend not configured. GitHub Pages hosts the UI only; open Settings to configure an HTTPS API.');
+    return;
+  }
+  addMsg('user', text);
+  $('#input').value = '';
+  logFeed('Sending to backend...');
+  try {
+    const res = await fetch(backend + '/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'auto',
+        messages: history.slice(-10).map(m => ({role: m.role, content: m.content}))
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+    const reply = data.choices?.[0]?.message?.content || 'No response';
+    addMsg('assistant', reply);
+    logFeed('Reply received');
+    speak(reply);
+  } catch (e) {
+    addMsg('assistant', 'Backend error: ' + e.message);
+    logFeed('Error: ' + e.message);
+  }
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text.slice(0, 400));
+  u.rate = 1.05;
+  speechSynthesis.speak(u);
+}
+
+// Voice
+let recognition;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onresult = e => {
+    const text = e.results[0][0].transcript;
+    $('#input').value = text;
+    send(text);
+    $('#voiceStatus').textContent = 'idle';
+  };
+  recognition.onerror = () => $('#voiceStatus').textContent = 'error';
+}
+
+$('#micBtn').onmousedown = () => {
+  if (recognition) { recognition.start(); $('#voiceStatus').textContent = 'listening'; }
+};
+$('#micBtn').onmouseup = () => { if (recognition) recognition.stop(); };
+
+$('#send').onclick = () => send($('#input').value);
+$('#input').onkeydown = e => { if (e.key === 'Enter') send($('#input').value); };
+
+// Backend test
+async function checkBackend() {
+  if (!backend) {
+    $('#backendStatus').textContent = 'MAYA API: not configured';
+    $('#backendStatus').style.color = 'var(--muted)';
+    $('#backendStatus').title = 'GitHub Pages is static and does not run the Python backend. Configure an HTTPS backend in Settings.';
+    return;
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+  try {
+    const response = await fetch(backend + '/health', {signal: controller.signal, cache: 'no-store'});
+    if (!response.ok) throw new Error('Health endpoint returned HTTP ' + response.status);
+    const health = await response.json();
+    if (health.status !== 'ok') throw new Error('Backend health response was not ok');
+    $('#backendStatus').textContent = 'MAYA API: online';
+    $('#backendStatus').style.color = 'var(--accent)';
+    $('#backendStatus').title = `${health.service || 'MAYA API'} · ${health.mode || 'ready'} · ${backend}`;
+  } catch (error) {
+    $('#backendStatus').textContent = 'MAYA API: offline';
+    $('#backendStatus').style.color = 'var(--danger)';
+    $('#backendStatus').title = `${error.name === 'AbortError' ? 'Health check timed out.' : error.message || 'Request blocked.'} Check that the API is running at ${backend}, and that browser CORS allows this page.`;
+  } finally { clearTimeout(timeout); }
+}
+checkBackend();
+setInterval(checkBackend, 30000);
+
+// Views
+$$('#nav button').forEach(btn => {
+  btn.onclick = () => {
+    $$('#nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    if (view === 'settings') {
+      const hosted = location.hostname.endsWith('.github.io');
+      const guidance = hosted
+        ? 'GitHub Pages is static and cannot run Maya. For same-device local use, open the dashboard served at http://127.0.0.1:5500. A hosted page needs your own HTTPS API and MAYA_ALLOWED_ORIGINS=https://codesbyfebin.github.io. Do not expose this prototype API publicly without authentication.'
+        : 'Enter the Maya API base URL. Local default: http://127.0.0.1:8001. The model server uses a different port.';
+      const url = prompt(guidance, backend || (isLocalDashboard ? LOCAL_BACKEND : ''));
+      if (url !== null) {
+        const normalized = normalizeBackend(url.trim());
+        if (url.trim() && !normalized) {
+          $('#backendStatus').textContent = 'Backend: invalid URL';
+          $('#backendStatus').title = 'Enter a valid http:// or https:// API base URL without credentials.';
+          return;
+        }
+        backend = normalized;
+        try {
+          if (backend) localStorage.setItem('maya_backend', backend);
+          else localStorage.removeItem('maya_backend');
+        } catch { /* setting remains active for this page session */ }
+        checkBackend();
+      }
+    } else {
+      logFeed('Switched to ' + view);
+    }
+  };
+});
+
+// Restore history
+history.forEach(m => addMsg(m.role, m.content));
+logFeed('MAYA v4.0 online');
+</script>
+</body>
+</html>
