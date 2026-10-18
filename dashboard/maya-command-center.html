@@ -33,7 +33,7 @@
     <main class="layout">
       <aside class="column left-stack" aria-label="Runtime and available tools">
         <section class="panel"><div class="panel-head"><span class="panel-title">Runtime link</span><span class="panel-code">SYS / 01</span></div><div class="panel-body"><div class="health-big"><div class="health-ring"><span id="health-glyph">···</span></div><div class="health-label"><strong id="health-name">Connecting</strong><small id="health-mode">Checking configured backend</small></div></div><div class="kv"><span>Backend</span><span id="backend-label" class="endpoint">127.0.0.1:8001</span><span>Runtime mode</span><span id="runtime-mode">—</span><span>Last check</span><span id="health-checked">—</span></div><button id="health-refresh" class="btn" type="button" style="width:100%;margin-top:12px;font-size:9px">↻ &nbsp; RECHECK CONNECTION</button></div></section>
-        <section class="panel"><div class="panel-head"><span class="panel-title">Policy-bound tools</span><span class="panel-code">READ ONLY</span></div><div class="panel-body"><div class="tool-row"><span class="tool-icon">⌕</span><div><div class="tool-name">list_dir</div><div class="tool-desc">Workspace directory listing</div></div><span class="readonly">BOUNDED</span></div><div class="tool-row"><span class="tool-icon">▤</span><div><div class="tool-name">read_file</div><div class="tool-desc">Size-limited file reads</div></div><span class="readonly">BOUNDED</span></div><div class="tool-row"><span class="tool-icon">›_</span><div><div class="tool-name">terminal_run</div><div class="tool-desc">Argument-policy allowlist</div></div><span class="readonly">BOUNDED</span></div><p class="local-note"><strong>No write tool is registered.</strong> Tools are checked by policy and logged to the local evidence trace.</p></div></section>
+        <section class="panel"><div class="panel-head"><span class="panel-title">Policy-bound tools</span><span class="panel-code">READ ONLY</span></div><div class="panel-body"><div class="tool-row"><span class="tool-icon">⌕</span><div><div class="tool-name">list_dir</div><div class="tool-desc">Workspace directory listing</div></div><span class="readonly">BOUNDED</span></div><div class="tool-row"><span class="tool-icon">▤</span><div><div class="tool-name">read_file</div><div class="tool-desc">Size-limited file reads</div></div><span class="readonly">BOUNDED</span></div><p class="local-note"><strong>Current API: list_dir and read_file only.</strong> Calls are recorded in the backend execution log.</p></div></section>
       </aside>
       <section class="panel center" aria-label="MAYA conversation">
         <div class="center-top"><div class="core" aria-hidden="true"><div class="core-inner">M</div></div><div class="core-caption">MAYA // READY<small>LOCAL-FIRST · TRACE-EMITTING RUNTIME</small></div><div class="suggestions"><button class="suggestion" type="button" data-prompt="What tools are available in this runtime?">Inspect available tools</button><button class="suggestion" type="button" data-prompt="Summarize the files in my allowed workspace.">Summarize workspace</button><button class="suggestion" type="button" data-prompt="Explain how I can verify a MAYA evidence trace.">How to verify a trace</button></div></div>
@@ -42,7 +42,7 @@
       </section>
       <aside class="column right-stack" aria-label="Run activity and evidence">
         <section class="panel" id="activity"><div class="panel-head"><span class="panel-title">Run activity</span><span id="event-count" class="panel-code">0 EVENTS</span></div><div class="panel-body activity-list" id="events"><div class="empty-events">Tool calls and model steps from the latest response will appear here.</div></div></section>
-        <section class="panel" id="evidence"><div class="panel-head"><span class="panel-title">Evidence receipt</span><span class="panel-code">EVIDENCE.V1</span></div><div class="panel-body"><div class="receipt-status"><i id="trace-dot" class="dot"></i><span id="trace-status" class="local-note">No run recorded in this session.</span></div><div class="eyebrow" style="margin-bottom:6px">LATEST RUN ID</div><div id="run-id" class="receipt-run">—</div><div class="eyebrow" style="margin:13px 0 6px">LOCAL TRACE FILE</div><div id="trace-path" class="receipt-run" style="color:var(--muted)">—</div><div class="receipt-actions"><button id="copy-path" class="btn" type="button" disabled>Copy path</button><button id="clear-history" class="btn danger" type="button">Clear chat</button></div><div class="verify-hint">MAYA writes a local hash-chained evidence record. Verify it from the repository root with <code>maya trace verify &lt;file&gt;</code>. The console does not claim a trace is verified.</div></div></section>
+        <section class="panel" id="evidence"><div class="panel-head"><span class="panel-title">Evidence receipt</span><span class="panel-code">EVIDENCE.V1</span></div><div class="panel-body"><div class="receipt-status"><i id="trace-dot" class="dot"></i><span id="trace-status" class="local-note">No run recorded in this session.</span></div><div class="eyebrow" style="margin-bottom:6px">LATEST RUN ID</div><div id="run-id" class="receipt-run">—</div><div class="eyebrow" style="margin:13px 0 6px">LOCAL TRACE FILE</div><div id="trace-path" class="receipt-run" style="color:var(--muted)">—</div><div class="receipt-actions"><button id="copy-path" class="btn" type="button" disabled>Copy path</button><button id="clear-history" class="btn danger" type="button">Clear chat</button></div><div class="verify-hint">The configured backend reports its trace path and verification state. This console does not infer or claim trace verification.</div></div></section>
         <section class="panel"><div class="panel-head"><span class="panel-title">Operator note</span><span class="panel-code">LOCAL</span></div><div class="panel-body local-note">The dashboard stores chat history in this browser. Evidence files are written by the backend on the machine running MAYA.</div></section>
       </aside>
     </main>
@@ -63,6 +63,12 @@
       let messages = [];
       let recognition = null;
       let sending = false;
+      let liveSocket = null;
+      let liveEvents = [];
+      let lastEventSeq = 0;
+      let reconnectDelay = 1000;
+      let reconnectTimer = 0;
+      let pingTimer = 0;
 
       function safeBackend(value) {
         try {
@@ -126,6 +132,7 @@
           const response = await fetch(`${backend}/health`, {signal: controller.signal, cache: "no-store"});
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
+          if (liveSocket?.readyState === WebSocket.OPEN) return;
           const healthy = data.status === "ok";
           dot.className = `dot ${healthy ? "online" : "offline"}`;
           $("status-text").textContent = healthy ? "BACKEND ONLINE" : "BACKEND NOT READY";
@@ -144,6 +151,100 @@
           clearTimeout(timer);
           $("health-checked").textContent = new Date().toLocaleTimeString();
         }
+      }
+      function updateLiveHealth(data) {
+        const healthy = data.status === "ok";
+        $("status-dot").className = `dot ${healthy ? "online" : "offline"}`;
+        $("status-text").textContent = healthy ? "BACKEND LIVE · WS" : "BACKEND NOT READY";
+        $("health-name").textContent = healthy ? "Live connection" : "Not ready";
+        $("health-glyph").textContent = healthy ? "LIVE" : "!";
+        $("health-mode").textContent = data.service || "MAYA backend";
+        $("runtime-mode").textContent = `${data.mode || "connected"} · WebSocket`;
+        $("health-checked").textContent = new Date().toLocaleTimeString();
+      }
+      function addLiveEvent(item) {
+        liveEvents.unshift(item);
+        liveEvents = liveEvents.slice(0, 30);
+        renderEvents(liveEvents);
+      }
+      function handleLiveEvent(event) {
+        if (!event || typeof event !== "object") return;
+        if (Number.isInteger(event.seq)) {
+          if (event.seq <= lastEventSeq) return;
+          lastEventSeq = event.seq;
+        }
+        if (event.type === "runtime_snapshot") {
+          updateLiveHealth(event);
+          for (const run of event.active_runs || []) {
+            addLiveEvent({event: "Agent request", status: "running", detail: String(run.task_id || ""), timestamp: run.started_at || event.timestamp});
+          }
+          return;
+        }
+        if (event.type === "pong") return;
+        if (event.type === "agent_event" && event.action === "working") {
+          $("run-id").textContent = event.task_id || "—";
+          $("trace-path").textContent = "Waiting for completion…";
+          $("copy-path").disabled = true;
+          $("trace-dot").className = "dot pending";
+          $("trace-status").textContent = "Agent request running; events are arriving live.";
+          addLiveEvent({event: "Agent request", status: "running", detail: event.task_id || "", timestamp: event.timestamp});
+          return;
+        }
+        if (event.type === "tool_event") {
+          addLiveEvent({tool: event.tool, status: event.status, detail: `Round ${(event.round || 0) + 1}`, timestamp: event.timestamp});
+          return;
+        }
+        if (event.type === "task_update") {
+          const success = event.status === "done";
+          addLiveEvent({event: "Agent request", status: success ? "success" : "error", detail: success ? `${event.tool_events || 0} tool event(s) completed` : "Backend reported request failure", timestamp: event.timestamp});
+          if (!success) {
+            $("trace-dot").className = "dot offline";
+            $("trace-status").textContent = "Agent request failed; see the response in chat.";
+          }
+        }
+      }
+      function liveUrl() {
+        const url = new URL(backend);
+        url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+        url.pathname = "/ws";
+        url.search = "";
+        return url.href;
+      }
+      function scheduleLiveReconnect() {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(connectLive, reconnectDelay);
+        reconnectDelay = Math.min(reconnectDelay * 2, 20000);
+      }
+      function connectLive() {
+        clearTimeout(reconnectTimer);
+        if (!backend || !("WebSocket" in window)) return;
+        let socket;
+        try { socket = new WebSocket(liveUrl()); liveSocket = socket; }
+        catch { scheduleLiveReconnect(); return; }
+        socket.onopen = () => {
+          if (liveSocket !== socket) return;
+          reconnectDelay = 1000;
+          clearInterval(pingTimer);
+          pingTimer = setInterval(() => {
+            if (liveSocket === socket && socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({type: "ping"}));
+          }, 25000);
+        };
+        socket.onmessage = (message) => {
+          if (liveSocket !== socket) return;
+          try { handleLiveEvent(JSON.parse(message.data)); }
+          catch { /* Ignore malformed server events; the REST path remains available. */ }
+        };
+        socket.onclose = () => {
+          if (liveSocket !== socket) return;
+          clearInterval(pingTimer);
+          $("status-dot").className = "dot pending";
+          $("status-text").textContent = "RECONNECTING · WS";
+          $("health-name").textContent = "Reconnecting";
+          $("health-glyph").textContent = "···";
+          $("health-mode").textContent = "Live event stream interrupted";
+          scheduleLiveReconnect();
+        };
+        socket.onerror = () => socket.close();
       }
       function renderEvents(events) {
         const host = $("events");
@@ -166,7 +267,7 @@
           type.className = "event-type";
           type.textContent = String(item.tool || item.event || item.type || "event");
           const state = document.createElement("span");
-          state.className = `event-state ${item.status === "error" || item.status === "denied" ? item.status : item.status === "ok" || item.status === "success" ? "success" : ""}`;
+          state.className = `event-state ${["error", "denied", "failed"].includes(item.status) ? (item.status === "failed" ? "error" : item.status) : item.status === "ok" || item.status === "success" ? "success" : ""}`;
           state.textContent = String(item.status || "recorded");
           const time = document.createElement("span");
           time.className = "event-time";
@@ -184,11 +285,12 @@
       }
       function setReceipt(maya) {
         const isTrace = maya && maya.execution_log === "evidence.v1";
-        $("trace-dot").className = `dot ${isTrace ? "online" : ""}`;
-        $("trace-status").textContent = isTrace ? "Evidence record saved by backend" : "This backend response did not include an evidence receipt.";
+        $("trace-dot").className = `dot ${isTrace ? "online" : maya?.log_path ? "pending" : ""}`;
+        $("trace-status").textContent = isTrace ? "Evidence record saved by backend" : maya?.log_path ? `Execution log saved · verification: ${maya.execution_log || "not reported"}` : "This backend response did not include an execution log.";
         $("run-id").textContent = maya?.run_id || "—";
         $("trace-path").textContent = maya?.log_path || "—";
         $("copy-path").disabled = !maya?.log_path;
+        liveEvents = [];
         renderEvents(maya?.tool_events);
       }
       async function sendPrompt(text) {
@@ -252,8 +354,9 @@
       updateClock();
       setInterval(updateClock, 1000);
       checkHealth();
-      setInterval(checkHealth, 30000);
+      setInterval(() => { if (liveSocket?.readyState !== WebSocket.OPEN) checkHealth(); }, 30000);
       $("health-refresh").addEventListener("click", checkHealth);
+      connectLive();
       $("chat-form").addEventListener("submit", (event) => { event.preventDefault(); sendPrompt($("prompt").value); });
       $("prompt").addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); $("chat-form").requestSubmit(); } });
       document.querySelectorAll(".suggestion").forEach((button) => button.addEventListener("click", () => { $("prompt").value = button.dataset.prompt || ""; $("prompt").focus(); }));
@@ -269,7 +372,9 @@
           try { localStorage.setItem(BACKEND_KEY, backend); } catch { /* settings still apply in this session */ }
           setBackendLabel();
           $("settings").classList.remove("open");
+          liveSocket?.close();
           checkHealth();
+          connectLive();
         } catch (error) { $("backend-url").setCustomValidity(error.message || "Enter a valid URL."); $("backend-url").reportValidity(); $("backend-url").setCustomValidity(""); }
       });
       $("clear-history").addEventListener("click", () => {
@@ -292,3 +397,4 @@
   </script>
 </body>
 </html>
+

@@ -53,6 +53,14 @@ The visual identity uses a near-black background, phosphor green accents, and cy
 
 Future work includes richer tool wrappers, additional workflow playbooks, a more complete memory index, evidence hashing for stronger provenance, and packaging options for desktop use. The current design already supports these extensions because the evidence contract and the tool boundary are explicit. Operators can add new playbooks by writing YAML, add new tools by following the wrapper pattern, and inspect every run through the traces that are already produced.
 
+## Live runtime events
+
+The command centre connects to the local backend WebSocket at /ws. On connect it receives a runtime snapshot, then receives agent start, tool outcome, completion, and failure events while a request runs. Events include a monotonically increasing sequence number and UTC timestamp. The client sends ping frames to keep the connection active; the server does not accept agent-starting commands over this channel.
+
+The stream is backed by Maya's current agent loop. Tool events expose only the tool name, status, and round. Prompts, arguments, file contents, and model responses stay out of the broadcast stream. Per-client queues are bounded, and the dashboard reconnects with backoff while retaining the HTTP health check as a fallback.
+
+WebSocket browser origins use the MAYA_ALLOWED_ORIGINS allowlist. Its default permits the local dashboard on ports 5500. For a Pages preview, explicitly add the exact deployed origin to the backend environment only when you trust that origin; the public showcase does not connect to a backend by default.
+
 ## License
 
 Apache-2.0
@@ -67,3 +75,4 @@ This documentation is written to describe the MAYA Agentic Harness in full. It c
 ## GitHub Pages
 
 MAYA's public static showcase is published at <https://codesbyfebin.github.io/Maya-Agentic-Harness/>. The hosted console starts disconnected and does not probe visitors' localhost. A backend URL must be configured explicitly, and the backend must allow the Pages origin in its CORS policy. The local dashboard served from `127.0.0.1:5500` remains the intended operator console.
+
