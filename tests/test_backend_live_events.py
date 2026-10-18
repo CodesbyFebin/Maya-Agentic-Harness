@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
+from starlette.websockets import WebSocketDisconnect
 
 from harness import backend_real
 
@@ -59,8 +61,8 @@ def test_websocket_streams_real_agent_and_tool_events(monkeypatch: Any) -> None:
 
 def test_websocket_rejects_unlisted_browser_origins() -> None:
     with TestClient(backend_real.app) as client:
-        with client.websocket_connect(
-            "/ws", headers={"origin": "https://untrusted.example"}
-        ) as websocket:
-            message = websocket.receive_json()
-            assert message["type"] != "runtime_snapshot"
+        with pytest.raises(WebSocketDisconnect):
+            with client.websocket_connect(
+                "/ws", headers={"origin": "https://untrusted.example"}
+            ):
+                pass
