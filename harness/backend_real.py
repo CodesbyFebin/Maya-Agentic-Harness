@@ -232,7 +232,7 @@ async def live_events(websocket: WebSocket) -> None:
                 message = receive_task.result()
                 if isinstance(message, dict) and message.get("type") == "ping":
                     await websocket.send_json({"type": "pong", "timestamp": datetime.now(timezone.utc).isoformat()})
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, RuntimeError, OSError):
         pass
     finally:
         event_hub.unsubscribe(queue)
@@ -261,11 +261,12 @@ async def chat_completions(request: ChatRequest) -> dict[str, Any]:
             emit=emit_from_worker,
             run_id=run_id,
         )
-    except RuntimeError as exc:
+    except Exception as exc:
         active_runs.pop(run_id, None)
         await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "failed", "agent": "MAYA agent loop"})
         await event_hub.publish({"type": "agent_event", "action": "error", "agent": "MAYA agent loop", "task_id": run_id, "error": "Configured model request failed"})
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+        detail = str(exc) if isinstance(exc, RuntimeError) else "Agent request failed unexpectedly"
+        raise HTTPException(status_code=502, detail=detail) from exc
     log_path = write_execution_log(query, events, result)
     active_runs.pop(run_id, None)
     await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "done", "agent": "MAYA agent loop", "tool_events": len(events)})
