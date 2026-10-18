@@ -26,6 +26,12 @@ test('console presents Maya and CodesbyFebin with the actual harness capabilitie
   assert.match(html, /No write tool is registered/);
 });
 
+test('NEXUS styling does not import its simulated services or metrics', () => {
+  assert.doesNotMatch(html, /NEXUS|Grok|BTC crossed|PR #142|12\/14|SIMULATIONS/);
+  assert.match(html, /class="corner tl"/);
+  assert.match(html, /--amber:#ffaa00/);
+});
+
 test('history restoration renders without writing duplicate messages back', () => {
   assert.match(html, /addBubble\(message\.role, message\.content, \{persist: false\}\)/);
   assert.match(html, /localStorage\.setItem\(HISTORY_KEY, JSON\.stringify\(messages\)\)/);
