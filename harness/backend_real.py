@@ -269,7 +269,7 @@ async def chat_completions(request: ChatRequest) -> dict[str, Any]:
     log_path = write_execution_log(query, events, result)
     active_runs.pop(run_id, None)
     await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "done", "agent": "MAYA agent loop", "tool_events": len(events)})
-    await event_hub.publish({"type": "agent_event", "action": "complete", "agent": "MAYA agent loop", "task_id": run_id, "result": "Response ready"})
+    await event_hub.publish({"type": "agent_event", "action": "complete", "agent": "MAYA agent loop", "task_id": run_id})
     return {
         "id": f"chatcmpl_{uuid.uuid4().hex}",
         "object": "chat.completion",
