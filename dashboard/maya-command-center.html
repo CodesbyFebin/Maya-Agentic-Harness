@@ -1,183 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M.A.Y.A. — Agentic Harness v4.0</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060a12">
+<title>MAYA // Agentic Command Centre</title>
+<meta name="description" content="MAYA local-first agentic harness command centre. Opt-in voice, inspectable tool runs, and explicit backend status.">
 <style>
-:root {
-  --bg: #010409; --panel: #0d1117; --accent: #00ff00; --cyan: #00e5ff;
-  --text: #e6edf3; --muted: #8b949e; --danger: #e85d4c;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
-header { background: #000; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
-header h1 { color: var(--accent); font-size: 1.4rem; letter-spacing: 2px; }
-.nav { display: flex; gap: 0.5rem; }
-.nav button { background: transparent; color: var(--cyan); border: 1px solid #30363d; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; }
-.nav button.active { background: var(--accent); color: #000; }
-main { flex: 1; display: grid; grid-template-columns: 280px 1fr 320px; gap: 1rem; padding: 1rem; overflow: hidden; }
-.panel { background: var(--panel); border: 1px solid #21262d; border-radius: 8px; padding: 1rem; overflow-y: auto; }
-#chat { display: flex; flex-direction: column; }
-#messages { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
-.msg { margin: 0.5rem 0; padding: 0.6rem; border-radius: 6px; }
-.user { background: #161b22; align-self: flex-end; }
-.assistant { background: #0d1117; border-left: 3px solid var(--accent); }
-.input-row { display: flex; gap: 0.5rem; }
-input, textarea { background: #0d1117; border: 1px solid #30363d; color: var(--text); padding: 0.6rem; border-radius: 4px; flex: 1; }
-button.primary { background: var(--accent); color: #000; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
-.status { font-size: 0.8rem; color: var(--muted); }
-#core { text-align: center; }
-.globe { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, var(--cyan), transparent); margin: 1rem auto; animation: pulse 3s infinite; }
-@keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+:root{color-scheme:dark;--bg:#060a12;--panel:#09111bea;--panel2:#0b1720;--line:#16313c;--line2:#214652;--text:#d8eef1;--muted:#79a3a7;--faint:#4d727a;--cyan:#35e8ff;--teal:#00ffc8;--orange:#ff9f43;--violet:#c28aff;--red:#ff6278;--green:#80ffb0;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--display:system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -30%,#112d39 0,transparent 54%),linear-gradient(#31d9ff08 1px,transparent 1px),linear-gradient(90deg,#31d9ff08 1px,transparent 1px),var(--bg);background-size:auto,34px 34px,34px 34px;color:var(--text);font:13px/1.55 var(--mono)}body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10;opacity:.18;background:repeating-linear-gradient(0deg,transparent 0 3px,#c8ffff09 4px)}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}a{color:inherit;text-decoration:none}.shell{min-height:100vh;display:grid;grid-template-columns:222px minmax(0,1fr)}.sidebar{position:sticky;top:0;height:100vh;padding:20px 13px 14px;background:#050a10ed;border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:12}.brand{display:flex;align-items:center;gap:11px;padding:0 7px 25px}.brand-mark{width:37px;height:37px;display:grid;place-items:center;border:1px solid var(--teal);color:var(--teal);font-weight:800;font-size:18px;clip-path:polygon(15% 0,85% 0,100% 18%,100% 82%,85% 100%,15% 100%,0 82%,0 18%);box-shadow:0 0 22px #00ffc825}.brand-name{font:700 14px var(--display);letter-spacing:.24em}.brand-sub{display:block;color:var(--faint);font-size:8px;letter-spacing:.15em;margin-top:4px}.nav-label{color:#50747c;font-size:8px;letter-spacing:.18em;padding:13px 10px 7px}.nav{display:grid;gap:4px}.nav button{display:flex;align-items:center;gap:10px;width:100%;padding:9px;border:1px solid transparent;background:transparent;color:#8daeb1;text-align:left;font-size:10px;letter-spacing:.03em;transition:.18s}.nav button:hover,.nav button.active{color:var(--teal);background:#00ffc80b;border-color:#00ffc824}.nav-icon{width:17px;text-align:center;font-size:13px;color:var(--cyan)}.side-spacer{flex:1}.privacy-card{padding:11px;border:1px solid #1e443e;background:linear-gradient(145deg,#0b1c1c,#09121a);font-size:9px}.privacy-card b{display:block;color:var(--teal);font-size:9px;letter-spacing:.08em;margin:6px 0}.privacy-card p{color:var(--muted);font-size:8px;margin:0;line-height:1.6}.session{display:flex;align-items:center;gap:8px;padding:13px 6px 0;color:var(--muted);font-size:9px}.session-mark{width:24px;height:24px;border:1px solid var(--line2);display:grid;place-items:center;color:var(--cyan)}.main{min-width:0;padding:0 clamp(16px,2vw,30px) 30px;max-width:1780px;width:100%;margin:auto}.topbar{height:58px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:12px}.crumb{color:var(--faint);font-size:9px;letter-spacing:.13em}.crumb b{color:#bdd6da;font-weight:500}.top-actions{display:flex;align-items:center;gap:9px}.health-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--line2);color:var(--muted);font-size:8px;letter-spacing:.09em}.health-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;box-shadow:0 0 8px currentColor}.health-pill.online{color:var(--teal);border-color:#146552}.health-pill.online .health-dot{background:var(--green)}.health-pill.error{color:var(--red);border-color:#5c2637}.health-pill.error .health-dot{background:var(--red)}.clock{color:var(--muted);font-size:9px}.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 4px 20px}.eyebrow{font-size:8px;color:var(--teal);letter-spacing:.2em}.hero h1{font:650 clamp(24px,3vw,38px)/1.12 var(--display);letter-spacing:.01em;margin:8px 0 7px}.hero h1 span{color:var(--cyan)}.hero p{max-width:630px;color:var(--muted);font-size:10px;margin:0}.hero-meta{text-align:right;color:var(--muted);font-size:8px;line-height:1.8;letter-spacing:.08em}.hero-meta strong{display:block;font-size:12px;color:var(--text);font-weight:500}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px}.stat,.panel{border:1px solid var(--line);background:linear-gradient(145deg,#0b1720f5,#071018f5);box-shadow:0 12px 34px #0003}.stat{padding:11px 13px;min-height:75px;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;width:54px;height:54px;right:-29px;bottom:-35px;border:1px solid #35e8ff29;transform:rotate(45deg)}.stat-label{font-size:8px;letter-spacing:.13em;color:var(--muted)}.stat-value{font:600 18px var(--mono);margin-top:6px;color:var(--teal);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stat-detail{font-size:8px;color:var(--faint);margin-top:1px}.panel{min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:9px;min-height:39px;padding:0 12px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;color:#bfe0e3;font-size:9px;font-weight:500;letter-spacing:.14em}.panel-head small{color:var(--faint);font-size:8px;letter-spacing:.07em;text-align:right}.panel-body{padding:12px}.dashboard-grid{display:grid;grid-template-columns:minmax(210px,.72fr) minmax(350px,1.35fr) minmax(230px,.82fr);gap:11px;align-items:start}.stack{display:grid;gap:11px;align-content:start}.core-panel{overflow:hidden;position:relative}.core-panel:before{content:"";position:absolute;right:-65px;top:-80px;width:230px;height:210px;background:radial-gradient(ellipse,#00caff14,transparent 68%);pointer-events:none}.core-wrap{display:grid;grid-template-columns:148px minmax(0,1fr);gap:12px;align-items:center}.core-visual{height:148px;position:relative;display:grid;place-items:center;isolation:isolate;overflow:hidden}.core-visual canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}.orb-ring{position:absolute;border:1px solid #35e8ff63;border-radius:50%;width:112px;height:112px;z-index:1;box-shadow:0 0 20px #35e8ff10,inset 0 0 18px #35e8ff0b}.orb-ring:before,.orb-ring:after{content:"";position:absolute;inset:9px;border:1px dashed #00ffc875;border-radius:50%;animation:spin 16s linear infinite}.orb-ring:after{inset:22px;border-color:#ff9f4380;border-style:solid;animation-direction:reverse;animation-duration:11s}.orb-ring.two{width:82px;height:82px;border-color:#ff9f4377;transform:rotate(35deg)}.orb-core{width:56px;height:56px;z-index:2;position:relative;border:1px solid var(--cyan);border-radius:50%;display:grid;align-content:center;text-align:center;background:radial-gradient(circle at 50% 40%,#155667,#071116 72%);box-shadow:0 0 25px #35e8ff65,inset 0 0 18px #35e8ff30}.orb-core:before{content:"";position:absolute;inset:-7px;border:1px solid #00ffc848;border-radius:50%;animation:ripple 2.8s ease-out infinite}.orb-core b{font:700 13px var(--display);color:var(--teal);letter-spacing:.12em}.orb-core small{font-size:6px;letter-spacing:.1em;color:var(--cyan)}.voice-panel.listening .orb-core{border-color:var(--teal);box-shadow:0 0 36px #00ffc86d,inset 0 0 19px #00ffc83d;animation:breathe .72s ease-in-out infinite alternate}.voice-panel.thinking .orb-core{border-color:var(--violet);box-shadow:0 0 36px #c28aff65,inset 0 0 19px #c28aff30;animation:breathe 1.05s ease-in-out infinite alternate}.voice-panel.speaking .orb-core{border-color:var(--orange);box-shadow:0 0 40px #ff9f4375,inset 0 0 20px #ff9f4330;animation:breathe .42s ease-in-out infinite alternate}.voice-panel.error .orb-core{border-color:var(--red);box-shadow:0 0 30px #ff62785a}.voice-copy{position:relative;z-index:1}.voice-state{font-size:8px;color:var(--cyan);letter-spacing:.15em}.voice-title{font:600 16px/1.2 var(--display);margin:6px 0;color:var(--text)}.voice-detail{font-size:9px;color:var(--muted);line-height:1.55}.transcript{margin-top:8px;min-height:30px;max-height:56px;overflow:auto;padding:7px 8px;border-left:2px solid #00ffc877;background:#050d13;color:#a9c2c7;font-size:8px;overflow-wrap:anywhere}.controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px}.btn{min-height:31px;padding:0 10px;border:1px solid var(--line2);background:#08151b;color:var(--cyan);font-size:8px;letter-spacing:.1em;transition:.16s}.btn:hover{border-color:var(--cyan);box-shadow:0 0 14px #35e8ff18}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04100e;font-weight:700}.btn.primary:hover{box-shadow:0 0 18px #00ffc83b}.btn.active{color:var(--orange);border-color:#885a2c}.btn:disabled{opacity:.45;cursor:not-allowed}.voice-note{margin-left:auto;max-width:210px;text-align:right;color:var(--faint);font-size:7px;line-height:1.45}.chat-panel{display:flex;flex-direction:column;min-height:260px;height:min(54vh,520px)}.messages{flex:1;min-height:100px;overflow:auto;padding:4px 3px 10px;scrollbar-color:#22515e transparent}.welcome{margin:auto;text-align:center;max-width:330px;color:var(--muted);font-size:9px}.welcome b{display:block;font:600 13px var(--display);color:var(--cyan);letter-spacing:.08em;margin-bottom:7px}.message{display:flex;flex-direction:column;gap:3px;max-width:88%;margin:8px 0;padding:8px 10px;border:1px solid #193541;background:#09151b;font-size:9px;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{margin-left:auto;border-color:#285b50;background:#0b211d}.message.assistant{border-left:2px solid var(--cyan)}.message-role{color:var(--faint);font-size:7px;letter-spacing:.12em}.input-form{display:flex;gap:7px;padding-top:8px;border-top:1px solid var(--line)}.input-form textarea{resize:vertical;min-height:41px;max-height:120px;flex:1;min-width:0;padding:8px 9px;background:#050d13;border:1px solid #1c3c48;color:var(--text);font:9px/1.5 var(--mono)}.input-form textarea::placeholder{color:#52747a}.send-btn{align-self:stretch;min-width:68px}.feed{display:grid;gap:8px;max-height:225px;overflow:auto}.feed-row{display:grid;grid-template-columns:8px minmax(0,1fr);gap:7px;align-items:start;font-size:8px}.feed-dot{width:5px;height:5px;margin-top:4px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px currentColor}.feed-row.error .feed-dot{background:var(--red)}.feed-row.good .feed-dot{background:var(--green)}.feed-row b{display:block;color:#c3dfe2;font-weight:500}.feed-row p{margin:2px 0 0;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}.feed-row time{display:block;margin-top:3px;color:var(--faint);font-size:7px}.integrations{display:grid;gap:6px}.integration{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 8px;border:1px solid #15303a;background:#071118;font-size:8px}.integration span:last-child{color:var(--faint);font-size:7px;letter-spacing:.08em}.integration .connected{color:var(--green)!important}.integration .off{color:var(--orange)!important}.mini-title{font-size:8px;color:var(--muted);letter-spacing:.12em;margin:0 0 8px}.agent-row,.workflow-row,.run-row,.memory-line{display:flex;align-items:flex-start;gap:8px;padding:8px;border:1px solid #17323d;background:#071118;margin-top:6px}.agent-badge{flex:none;width:23px;height:23px;display:grid;place-items:center;border:1px solid #265260;color:var(--cyan);font-size:8px}.agent-row b,.workflow-row b,.run-row b{font-size:9px;color:#d3e9eb;font-weight:500}.agent-row p,.workflow-row p,.run-row p,.memory-line p{margin:2px 0 0;font-size:8px;color:var(--muted);line-height:1.45}.meta{margin-left:auto;color:var(--faint);font-size:7px;text-align:right}.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.detail-cell{padding:10px;border:1px solid #17323d;background:#071118}.detail-cell small{display:block;color:var(--faint);font-size:7px;letter-spacing:.12em}.detail-cell b{display:block;margin-top:5px;color:var(--cyan);font-size:9px;overflow-wrap:anywhere}.view{display:none}.view.active{display:block}.section-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.8fr);gap:11px;align-items:start}.settings-form{display:grid;gap:10px;max-width:620px}.settings-form label{color:var(--muted);font-size:8px;letter-spacing:.1em}.settings-form input{display:block;width:100%;margin-top:5px;padding:9px;background:#050d13;border:1px solid #1c3c48;color:var(--text);font-size:9px}.settings-form .check{display:flex;align-items:center;gap:8px;letter-spacing:0}.settings-form input[type=checkbox]{width:14px;margin:0;accent-color:var(--teal)}.hint{font-size:8px;color:var(--faint);line-height:1.6}.empty{padding:13px;color:var(--faint);text-align:center;font-size:8px}.toast{position:fixed;right:17px;bottom:16px;z-index:30;max-width:min(360px,calc(100vw - 28px));padding:10px 12px;border:1px solid #236456;background:#071613;color:var(--teal);font-size:9px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}.only-mobile{display:none}@keyframes spin{to{transform:rotate(360deg)}}@keyframes ripple{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.42);opacity:0}}@keyframes breathe{to{transform:scale(1.07)}}@media(max-width:1120px){.dashboard-grid{grid-template-columns:minmax(190px,.72fr) minmax(350px,1.3fr)}.right-stack{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}.right-stack>.panel:first-child{grid-row:span 2}}
+@media(max-width:760px){.shell{display:block}.sidebar{position:sticky;top:0;height:auto;padding:9px 10px;background:#050a10f5;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 3px 8px}.brand-mark{width:29px;height:29px}.brand-name{font-size:12px}.nav-label,.privacy-card,.session{display:none}.nav{display:flex;overflow:auto;gap:4px;scrollbar-width:thin}.nav button{width:auto;white-space:nowrap;padding:7px 8px;font-size:8px}.nav-icon{width:auto}.main{padding:0 11px 22px}.topbar{height:43px}.clock{display:none}.hero{padding:18px 2px 14px}.hero-meta{font-size:7px}.hero-meta strong{font-size:9px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.stat{min-height:65px;padding:9px}.stat-value{font-size:15px}.dashboard-grid{grid-template-columns:1fr}.stack,.right-stack{grid-template-columns:1fr}.right-stack>.panel:first-child{grid-row:auto}.core-wrap{grid-template-columns:116px minmax(0,1fr);gap:8px}.core-visual{height:116px}.orb-ring{width:92px;height:92px}.orb-ring.two{width:68px;height:68px}.orb-core{width:48px;height:48px}.chat-panel{height:400px;min-height:330px}.section-grid{grid-template-columns:1fr}.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.voice-note{flex-basis:100%;max-width:none;text-align:left;margin-left:0}.only-mobile{display:inline}}
+@media(max-width:390px){.core-wrap{grid-template-columns:94px minmax(0,1fr)}.core-visual{height:94px}.orb-ring{width:78px;height:78px}.orb-ring.two{width:58px;height:58px}.orb-core{width:42px;height:42px}.orb-core b{font-size:11px}.voice-title{font-size:13px}.hero-meta{display:none}.input-form{gap:5px}.send-btn{min-width:56px;padding:0 7px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>M.A.Y.A.</h1>
-  <div class="nav" id="nav">
-    <button class="active" data-view="center">Command</button>
-    <button data-view="agents">Agents</button>
-    <button data-view="tasks">Tasks</button>
-    <button data-view="memory">Memory</button>
-    <button data-view="workflows">Workflows</button>
-    <button data-view="settings">Settings</button>
-  </div>
-  <span class="status" id="backendStatus">Backend: offline</span>
-</header>
-<main>
-  <div class="panel" id="left">
-    <h3>System</h3>
-    <div id="core"><div class="globe"></div><p>AI Core</p></div>
-    <p class="status">Voice: <span id="voiceStatus">idle</span></p>
-    <button id="micBtn" class="primary" style="width:100%;margin-top:1rem;">Hold to Speak</button>
-  </div>
-  <div class="panel" id="chat">
-    <div id="messages"></div>
-    <div class="input-row">
-      <input id="input" placeholder="Speak or type to MAYA..." />
-      <button id="send" class="primary">Send</button>
+<div class="shell">
+<aside class="sidebar">
+  <a class="brand" href="#command" aria-label="MAYA Command Centre"><span class="brand-mark">M</span><span><span class="brand-name">MAYA</span><small class="brand-sub">AGENTIC HARNESS / LOCAL FIRST</small></span></a>
+  <div class="nav-label">OPERATOR DESK</div>
+  <nav class="nav" id="nav" aria-label="MAYA pages">
+    <button class="active" data-view="command"><span class="nav-icon">⌘</span>Command centre</button>
+    <button data-view="agents"><span class="nav-icon">◎</span>Agent crew</button>
+    <button data-view="tasks"><span class="nav-icon">▣</span>Run history</button>
+    <button data-view="memory"><span class="nav-icon">◈</span>Memory</button>
+    <button data-view="workflows"><span class="nav-icon">⌘</span>Workflows</button>
+    <button data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+  </nav>
+  <div class="side-spacer"></div>
+  <div class="privacy-card"><span class="nav-label" style="padding:0">RUNTIME BOUNDARY</span><b>◉ HUMAN IN CONTROL</b><p>Voice starts on your click. The configured backend receives prompts. Tool access depends on that backend's policy.</p></div>
+  <div class="session"><span class="session-mark">OP</span><span>LOCAL BROWSER SESSION<br><span id="session-state">CHAT HISTORY ON THIS DEVICE</span></span></div>
+</aside>
+<main class="main">
+  <header class="topbar"><div class="crumb">MAYA <span style="color:#42636a">/</span> <b id="crumb-view">COMMAND CENTRE</b></div><div class="top-actions"><span id="backend-pill" class="health-pill"><i class="health-dot"></i><span id="backendStatus">CHECKING BACKEND</span></span><span class="clock" id="clock">--:--:--</span></div></header>
+  <section class="hero"><div><div class="eyebrow">// SYSTEMS THAT PROVE WHAT HAPPENED</div><h1>AGENTIC <span>COMMAND CENTRE</span></h1><p>One operator surface for Maya’s chat, voice, agent runtime, workflows, and evidence-aware execution. Live indicators reflect connected endpoints only.</p></div><div class="hero-meta"><strong id="hero-backend">BACKEND CHECKING</strong>LOCAL-FIRST · OPT-IN VOICE<br>NO AUTONOMOUS EXTERNAL ACTIONS</div></section>
+  <section class="stats" aria-label="MAYA runtime status">
+    <div class="stat"><div class="stat-label">BACKEND</div><div class="stat-value" id="stat-backend">CHECKING</div><div class="stat-detail" id="stat-backend-detail">configured endpoint</div></div>
+    <div class="stat"><div class="stat-label">VOICE INPUT</div><div class="stat-value" id="stat-voice">PUSH TO TALK</div><div class="stat-detail" id="stat-voice-detail">browser support varies</div></div>
+    <div class="stat"><div class="stat-label">SESSION MESSAGES</div><div class="stat-value" id="stat-messages">00</div><div class="stat-detail">saved in this browser</div></div>
+    <div class="stat"><div class="stat-label">TOOL SURFACE</div><div class="stat-value">READ ONLY</div><div class="stat-detail">per current harness API</div></div>
+  </section>
+  <section class="view active" id="command" data-view-panel="command">
+    <div class="dashboard-grid">
+      <div class="stack">
+        <section class="panel voice-panel" id="voice-panel"><div class="panel-head"><h2>MAYA CORE / VOICE LINK</h2><small>MICROPHONE OPT-IN</small></div><div class="panel-body"><div class="core-wrap"><div class="core-visual" aria-hidden="true"><canvas id="core-canvas"></canvas><div class="orb-ring"></div><div class="orb-ring two"></div><div class="orb-core"><b>MAYA</b><small>CORE</small></div></div><div class="voice-copy"><small class="voice-state" id="voice-label">VOICE LINK / IDLE</small><h2 class="voice-title" id="voice-title">Standing by.</h2><p class="voice-detail" id="voice-detail">Talk to MAYA when you press the microphone button. You can stop listening or interrupt speech at any time.</p></div></div><div class="transcript" id="transcript" aria-live="polite">Voice transcript will appear here.</div><div class="controls"><button class="btn primary" id="micBtn" type="button">◉ TALK TO MAYA</button><button class="btn" id="stopSpeech" type="button">■ STOP AUDIO</button><label class="voice-note">Browser speech input may use its configured recognition service. It is never started automatically.</label></div></div></section>
+        <section class="panel chat-panel"><div class="panel-head"><h2>CONVERSATION / OPERATOR INPUT</h2><small id="model-label">MODEL: AUTO</small></div><div class="messages" id="messages" aria-live="polite"><div class="welcome" id="welcome"><b>HELLO, OPERATOR</b>Enter a request or use push-to-talk. MAYA sends it to the backend URL shown in Settings.</div></div><form class="input-form" id="chat-form"><textarea id="input" rows="2" maxlength="20000" placeholder="Ask MAYA to inspect, research, or help with a task…" aria-label="Message MAYA"></textarea><button class="btn primary send-btn" id="send" type="submit">SEND ↗</button></form></section>
+      </div>
+      <div class="stack">
+        <section class="panel"><div class="panel-head"><h2>AGENT PATH</h2><small id="agent-runtime">WAITING FOR BACKEND</small></div><div class="panel-body"><div class="agent-row"><span class="agent-badge">01</span><div><b>Agent loop</b><p>Receives the operator request and returns a final response.</p></div><span class="meta" id="agent-loop-status">STANDBY</span></div><div class="agent-row"><span class="agent-badge">02</span><div><b>Read-only tools</b><p>Directory listing and file reading, restricted to configured allowed roots.</p></div><span class="meta">2 TOOLS</span></div><div class="agent-row"><span class="agent-badge">03</span><div><b>Evidence trace</b><p>Backend may return a trace path and tool events for this run.</p></div><span class="meta">PER RESPONSE</span></div><p class="hint" style="margin:9px 0 0">This view describes the repository’s current harness. It does not imply other agents or tools are running.</p></div></section>
+        <section class="panel"><div class="panel-head"><h2>INTEGRATION STATUS</h2><small>REPORTED BY THIS UI</small></div><div class="panel-body"><div class="integrations"><div class="integration"><span>MAYA BACKEND</span><span id="integration-backend" class="off">CHECKING</span></div><div class="integration"><span>MODEL ENDPOINT</span><span id="integration-model" class="off">VIA BACKEND</span></div><div class="integration"><span>GITHUB / SLACK / CALENDAR</span><span class="off">NOT CONNECTED</span></div><div class="integration"><span>TRADING / HOST METRICS</span><span class="off">NOT CONNECTED</span></div></div><p class="hint" style="margin:9px 0 0">MAYA does not fabricate live feeds. External integrations need their own authenticated connector and data route.</p></div></section>
+        <section class="panel"><div class="panel-head"><h2>RECENT RUN EVIDENCE</h2><small id="runs-count">0 THIS SESSION</small></div><div class="panel-body"><div id="recent-runs"><div class="empty">No requests have been sent this session.</div></div></div></section>
+      </div>
+      <div class="stack">
+        <section class="panel"><div class="panel-head"><h2>LIVE EVENT FEED</h2><small>LOCAL UI EVENTS</small></div><div class="panel-body"><div class="feed" id="feed"><div class="empty">Waiting for activity…</div></div></div></section>
+        <section class="panel"><div class="panel-head"><h2>SESSION SNAPSHOT</h2><small>BROWSER-SAVED</small></div><div class="panel-body"><div class="detail-grid"><div class="detail-cell"><small>MESSAGES</small><b id="snapshot-messages">0</b></div><div class="detail-cell"><small>RUNS</small><b id="snapshot-runs">0</b></div><div class="detail-cell"><small>VOICE</small><b id="snapshot-voice">READY</b></div></div><p class="hint" style="margin:9px 0 0">Conversation history is stored in this browser profile. Backend execution traces are separate files managed by the local harness.</p></div></section>
+      </div>
     </div>
-  </div>
-  <div class="panel" id="right">
-    <h3>Live Feed</h3>
-    <div id="feed" class="status">Waiting for activity...</div>
-  </div>
+  </section>
+  <section class="view" id="view-agents" data-view-panel="agents"><div class="section-grid"><section class="panel"><div class="panel-head"><h2>AGENT CREW / CURRENT IMPLEMENTATION</h2><small>NO DECORATIVE AGENT COUNTS</small></div><div class="panel-body"><div class="agent-row"><span class="agent-badge">01</span><div><b>MAYA agent loop</b><p>OpenAI-compatible chat request with bounded tool rounds. Tools exposed by the backend are listed below.</p></div><span class="meta" id="agent-view-status">CHECKING</span></div><div class="agent-row"><span class="agent-badge">FS</span><div><b>list_dir</b><p>Lists non-hidden entries under an allowed filesystem root.</p></div><span class="meta">READ ONLY</span></div><div class="agent-row"><span class="agent-badge">RF</span><div><b>read_file</b><p>Reads a bounded portion of a file under an allowed filesystem root.</p></div><span class="meta">READ ONLY</span></div><div class="agent-row"><span class="agent-badge">—</span><div><b>Shell, browser, trading, messaging</b><p>These tools are not exposed by the current backend response.</p></div><span class="meta">UNAVAILABLE</span></div></div></section><aside class="panel"><div class="panel-head"><h2>RUNTIME STATE</h2><small>HEALTH RESPONSE</small></div><div class="panel-body"><div class="detail-grid"><div class="detail-cell"><small>STATUS</small><b id="agent-health">UNKNOWN</b></div><div class="detail-cell"><small>MODE</small><b id="agent-mode">—</b></div><div class="detail-cell"><small>SERVICE</small><b id="agent-service">—</b></div></div><p class="hint" style="margin-top:10px">A successful health check confirms only that the health endpoint responded. It does not test an inference request.</p></div></aside></div></section>
+  <section class="view" id="view-tasks" data-view-panel="tasks"><section class="panel"><div class="panel-head"><h2>RUN HISTORY</h2><small>THIS BROWSER SESSION</small></div><div class="panel-body"><div id="all-runs"><div class="empty">No runs yet.</div></div><p class="hint" style="margin:10px 0 0">The backend currently returns per-request tool events and an execution-log path. There is no API for listing or reopening historical traces.</p></div></section></section>
+  <section class="view" id="view-memory" data-view-panel="memory"><div class="section-grid"><section class="panel"><div class="panel-head"><h2>MEMORY / CONVERSATION</h2><small>LOCAL BROWSER STORAGE</small></div><div class="panel-body"><p class="hint">MAYA’s current dashboard stores recent conversation turns in this browser profile. The backend repository includes a SQLite helper and a memory schema, but does not expose a memory endpoint to this dashboard.</p><div class="detail-grid"><div class="detail-cell"><small>SAVED TURNS</small><b id="memory-turns">0</b></div><div class="detail-cell"><small>STORAGE</small><b>BROWSER LOCAL</b></div><div class="detail-cell"><small>BACKEND MEMORY API</small><b>NOT EXPOSED</b></div></div><div class="controls"><button class="btn" id="clear-history" type="button">CLEAR LOCAL HISTORY</button></div></div></section><aside class="panel"><div class="panel-head"><h2>DATA CONTROL</h2><small>OPERATOR-INITIATED</small></div><div class="panel-body"><p class="hint">Clearing history removes the dashboard’s stored messages and session run list from this browser only. It does not delete backend trace files.</p></div></aside></div></section>
+  <section class="view" id="view-workflows" data-view-panel="workflows"><div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKFLOW PLAYBOOKS</h2><small>REPOSITORY DEFINITIONS</small></div><div class="panel-body"><div class="workflow-row"><span class="agent-badge">01</span><div><b>Deep research</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">02</span><div><b>Code assistant</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">03</span><div><b>System monitor</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">04</span><div><b>File organizer</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">05</span><div><b>Morning digest</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">06</span><div><b>Email triage</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div><div class="workflow-row"><span class="agent-badge">07</span><div><b>News brief</b><p>YAML playbook present in repository; not exposed as a dashboard endpoint.</p></div><span class="meta">NOT INVOKABLE HERE</span></div></div></section><aside class="panel"><div class="panel-head"><h2>SAFE BY DEFAULT</h2><small>NO PRETEND EXECUTION</small></div><div class="panel-body"><p class="hint">Sending a chat prompt does not launch a workflow from this screen. The present API supports chat and its bounded read-only tool loop.</p></div></aside></div></section>
+  <section class="view" id="view-settings" data-view-panel="settings"><div class="section-grid"><section class="panel"><div class="panel-head"><h2>CONNECTION SETTINGS</h2><small>STORED IN THIS BROWSER</small></div><div class="panel-body"><form id="settings-form" class="settings-form"><label>BACKEND BASE URL<input id="backend-input" type="url" placeholder="http://127.0.0.1:8001" autocomplete="url" required></label><p class="hint">For the real harness, start <code>backend_real.py</code> on port 8001. For the test stub, use port 8000. Requests send chat history to this URL. Do not configure a backend you do not trust.</p><label class="check"><input id="speech-replies" type="checkbox"> Speak MAYA replies with browser speech synthesis</label><button class="btn primary" type="submit" style="justify-self:start">SAVE &amp; CHECK</button></form></div></section><aside class="panel"><div class="panel-head"><h2>PRIVACY / VOICE</h2><small>READ BEFORE USE</small></div><div class="panel-body"><p class="hint">Voice input is activated only by the microphone button. Browser speech recognition may send audio to the browser vendor’s service. You can use text only by leaving the microphone untouched. Speech synthesis is interruptible with Stop Audio.</p></div></aside></div></section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </main>
-
+</div>
 <script>
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-
-let backend = localStorage.getItem('maya_backend') || 'http://localhost:3001';
-let history = JSON.parse(localStorage.getItem('maya_history') || '[]');
-
-function saveHistory() { localStorage.setItem('maya_history', JSON.stringify(history.slice(-50))); }
-
-function addMsg(role, text) {
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.textContent = text;
-  $('#messages').appendChild(div);
-  $('#messages').scrollTop = $('#messages').scrollHeight;
-  history.push({role, content: text});
-  saveHistory();
-}
-
-function logFeed(msg) {
-  const p = document.createElement('p');
-  p.textContent = new Date().toLocaleTimeString() + ' ' + msg;
-  $('#feed').prepend(p);
-}
-
-async function send(text) {
-  if (!text.trim()) return;
-  addMsg('user', text);
-  $('#input').value = '';
-  logFeed('Sending to backend...');
-  try {
-    const res = await fetch(backend + '/v1/chat/completions', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'auto',
-        messages: history.slice(-10).map(m => ({role: m.role, content: m.content}))
-      })
-    });
-    const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || 'No response';
-    addMsg('assistant', reply);
-    logFeed('Reply received');
-    speak(reply);
-  } catch (e) {
-    addMsg('assistant', 'Backend error: ' + e.message);
-    logFeed('Error: ' + e.message);
-  }
-}
-
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(text.slice(0, 400));
-  u.rate = 1.05;
-  speechSynthesis.speak(u);
-}
-
-// Voice
-let recognition;
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.onresult = e => {
-    const text = e.results[0][0].transcript;
-    $('#input').value = text;
-    send(text);
-    $('#voiceStatus').textContent = 'idle';
-  };
-  recognition.onerror = () => $('#voiceStatus').textContent = 'error';
-}
-
-$('#micBtn').onmousedown = () => {
-  if (recognition) { recognition.start(); $('#voiceStatus').textContent = 'listening'; }
-};
-$('#micBtn').onmouseup = () => { if (recognition) recognition.stop(); };
-
-$('#send').onclick = () => send($('#input').value);
-$('#input').onkeydown = e => { if (e.key === 'Enter') send($('#input').value); };
-
-// Backend test
-async function checkBackend() {
-  try {
-    await fetch(backend + '/v1/models', {method: 'GET'});
-    $('#backendStatus').textContent = 'Backend: online (' + backend + ')';
-    $('#backendStatus').style.color = 'var(--accent)';
-  } catch {
-    $('#backendStatus').textContent = 'Backend: offline';
-    $('#backendStatus').style.color = 'var(--danger)';
-  }
-}
-checkBackend();
-setInterval(checkBackend, 30000);
-
-// Views
-$$('#nav button').forEach(btn => {
-  btn.onclick = () => {
-    $$('#nav button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const view = btn.dataset.view;
-    if (view === 'settings') {
-      const url = prompt('Backend URL', backend);
-      if (url) { backend = url; localStorage.setItem('maya_backend', url); checkBackend(); }
-    } else {
-      logFeed('Switched to ' + view);
-    }
-  };
-});
-
-// Restore history
-history.forEach(m => addMsg(m.role, m.content));
-logFeed('MAYA v4.0 online');
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const DEFAULT_BACKEND='http://127.0.0.1:8001';
+let backend=localStorage.getItem('maya_backend')||DEFAULT_BACKEND;
+let history=[];try{const saved=JSON.parse(localStorage.getItem('maya_history')||'[]');history=Array.isArray(saved)?saved.filter(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string').slice(-50):[]}catch{}
+let runs=[];try{const saved=JSON.parse(localStorage.getItem('maya_runs')||'[]');runs=Array.isArray(saved)?saved.slice(-30):[]}catch{}
+let recognition=null,listening=false,sending=false,speakReplies=localStorage.getItem('maya_speak')==='true',voiceMode='idle',healthData=null,toastTimer=0;
+const feedItems=[];const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setVoice(mode,label,title,detail){voiceMode=mode;$('#voice-panel').className=`panel voice-panel ${mode}`;$('#voice-label').textContent=label;$('#voice-title').textContent=title;$('#voice-detail').textContent=detail;$('#stat-voice').textContent=mode==='listening'?'LISTENING':mode==='thinking'?'PROCESSING':mode==='speaking'?'SPEAKING':mode==='error'?'ERROR':'PUSH TO TALK';$('#snapshot-voice').textContent=mode.toUpperCase()}
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600)}
+function addFeed(message,type=''){feedItems.unshift({message,type,time:now()});feedItems.length=Math.min(feedItems.length,18);renderFeed()}
+function renderFeed(){const box=$('#feed');box.replaceChildren();if(!feedItems.length){box.innerHTML='<div class="empty">Waiting for activity…</div>';return}for(const item of feedItems){const row=document.createElement('div');row.className='feed-row '+item.type;const dot=document.createElement('i');dot.className='feed-dot';const body=document.createElement('div');const p=document.createElement('p');p.textContent=item.message;const time=document.createElement('time');time.textContent=item.time;body.append(p,time);row.append(dot,body);box.append(row)}}
+function persist(){localStorage.setItem('maya_history',JSON.stringify(history.slice(-50)));localStorage.setItem('maya_runs',JSON.stringify(runs.slice(-30)));$('#stat-messages').textContent=String(history.length).padStart(2,'0');$('#snapshot-messages').textContent=String(history.length);$('#memory-turns').textContent=String(history.length);$('#snapshot-runs').textContent=String(runs.length);$('#runs-count').textContent=`${runs.length} THIS SESSION`;renderMessages();renderRuns()}
+function renderMessages(){const box=$('#messages');box.replaceChildren();if(!history.length){const welcome=document.createElement('div');welcome.className='welcome';welcome.innerHTML='<b>HELLO, OPERATOR</b>Enter a request or use push-to-talk. MAYA sends it to the backend URL shown in Settings.';box.append(welcome);return}for(const m of history){const el=document.createElement('div');el.className='message '+m.role;const role=document.createElement('small');role.className='message-role';role.textContent=m.role==='user'?'OPERATOR':'MAYA';const text=document.createElement('div');text.textContent=m.content;el.append(role,text);box.append(el)}box.scrollTop=box.scrollHeight}
+function renderRuns(){const targets=[$('#recent-runs'),$('#all-runs')];for(const target of targets){target.replaceChildren();if(!runs.length){target.innerHTML='<div class="empty">No runs yet.</div>';continue}for(const run of [...runs].reverse()){const row=document.createElement('div');row.className='run-row';const badge=document.createElement('span');badge.className='agent-badge';badge.textContent=run.ok?'OK':'ERR';const text=document.createElement('div');const b=document.createElement('b');b.textContent=run.query;const p=document.createElement('p');p.textContent=run.ok?`${run.toolEvents} tool event(s) · execution trace ${run.trace||'not returned'}`:`Request failed · ${run.error}`;text.append(b,p);const meta=document.createElement('span');meta.className='meta';meta.textContent=run.time;row.append(badge,text,meta);target.append(row)}}}
+function safeBackend(value){const u=new URL(value);if(!['http:','https:'].includes(u.protocol)||u.username||u.password)throw new Error('Use an HTTP(S) URL without embedded credentials.');return u.origin+u.pathname.replace(/\/$/,'')}
+async function checkBackend(){const pill=$('#backend-pill');try{const base=safeBackend(backend);const response=await fetch(base+'/health',{cache:'no-store',signal:AbortSignal.timeout(4000)});if(!response.ok)throw new Error(`health returned ${response.status}`);const data=await response.json();healthData=data;pill.className='health-pill online';$('#backendStatus').textContent='BACKEND ONLINE';$('#stat-backend').textContent='ONLINE';$('#stat-backend-detail').textContent=data.service||'health endpoint responded';$('#hero-backend').textContent=String(data.service||'BACKEND ONLINE').toUpperCase();$('#integration-backend').textContent='CONNECTED';$('#integration-backend').className='connected';$('#integration-model').textContent='NOT PROBED';$('#integration-model').className='off';$('#agent-runtime').textContent=String(data.mode||'HEALTH CHECK OK').toUpperCase();$('#agent-loop-status').textContent='AVAILABLE';$('#agent-view-status').textContent='AVAILABLE';$('#agent-health').textContent=String(data.status||'OK').toUpperCase();$('#agent-mode').textContent=String(data.mode||'—').toUpperCase();$('#agent-service').textContent=String(data.service||'MAYA').toUpperCase();addFeedOnce(`MAYA backend reachable (${data.service||base}).`,'good')}catch(error){healthData=null;pill.className='health-pill error';$('#backendStatus').textContent='BACKEND OFFLINE';$('#stat-backend').textContent='OFFLINE';$('#stat-backend-detail').textContent='check configured URL';$('#hero-backend').textContent='BACKEND OFFLINE';$('#integration-backend').textContent='UNREACHABLE';$('#integration-backend').className='off';$('#agent-runtime').textContent='BACKEND OFFLINE';$('#agent-loop-status').textContent='UNAVAILABLE';$('#agent-view-status').textContent='UNAVAILABLE';$('#agent-health').textContent='OFFLINE';$('#agent-mode').textContent='—';$('#agent-service').textContent='—';if(!feedItems.some(x=>x.message.startsWith('Backend unreachable')))addFeed(`Backend unreachable: ${error.message}`,'error')}}
+let lastHealthMessage='';function addFeedOnce(message,type){if(message===lastHealthMessage)return;lastHealthMessage=message;addFeed(message,type)}
+async function send(text){text=String(text||'').trim();if(!text||sending)return;const query=text.slice(0,20000);history.push({role:'user',content:query});persist();$('#input').value='';$('#transcript').textContent=`YOU: ${query}`;setVoice('thinking','MAYA / REQUEST SENT','Working on it.','Waiting for the configured backend.');sending=true;$('#send').disabled=true;$('#send').textContent='…';addFeed('Request sent to the configured backend.');const started=Date.now();try{const base=safeBackend(backend);const response=await fetch(base+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'auto',messages:history.slice(-10).map(m=>({role:m.role,content:m.content}))}),signal:AbortSignal.timeout(65000)});let data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.detail||data.error||`Backend returned ${response.status}`);const reply=data.choices?.[0]?.message?.content;if(typeof reply!=='string'||!reply.trim())throw new Error('Backend returned no assistant text.');history.push({role:'assistant',content:reply.trim()});const maya=data.maya||{},toolEvents=Array.isArray(maya.tool_events)?maya.tool_events:[];const run={query,ok:true,toolEvents:toolEvents.length,trace:maya.execution_log||'not returned',time:now(),elapsed:Date.now()-started};runs.push(run);persist();addFeed(`Response received in ${(run.elapsed/1000).toFixed(1)}s · ${toolEvents.length} tool event(s).`,'good');const traceNote=maya.execution_log==='unverified'?' Backend labels this execution log unverified.':'';$('#transcript').textContent=`MAYA: ${reply.trim().slice(0,600)}${traceNote}`;if(speakReplies)speak(reply.trim());else setVoice('idle','VOICE LINK / IDLE','Response received.','Read the answer in the conversation panel. Press the mic to start another turn.')}catch(error){history.push({role:'assistant',content:`Request failed: ${error.message}`});const run={query,ok:false,error:error.message,time:now(),toolEvents:0,trace:''};runs.push(run);persist();addFeed(`Request failed: ${error.message}`,'error');$('#transcript').textContent=`MAYA: Request failed — ${error.message}`;setVoice('error','MAYA / CONNECTION ERROR','I could not complete that request.','Check the backend connection, then retry or continue in text mode.')}finally{sending=false;$('#send').disabled=false;$('#send').textContent='SEND ↗'}}
+function speak(text){if(!('speechSynthesis'in window)||!('SpeechSynthesisUtterance'in window)){setVoice('idle','VOICE OUTPUT / UNSUPPORTED','Response ready.','Your browser does not support spoken replies.');return}speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(text.slice(0,1800));utterance.rate=1.02;utterance.onstart=()=>setVoice('speaking','MAYA / SPEAKING','Here is the response.','Press Stop Audio or the mic button to interrupt speech.');utterance.onend=()=>{if(!listening)setVoice('idle','VOICE LINK / IDLE','Standing by.','Talk to MAYA or type another request.')};utterance.onerror=()=>{if(!listening)setVoice('error','VOICE OUTPUT / ERROR','Speech output failed.','The response remains available in the conversation panel.')};speechSynthesis.speak(utterance)}
+function setupVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const mic=$('#micBtn');if(!SR){mic.disabled=true;mic.textContent='MIC INPUT UNAVAILABLE';$('#stat-voice').textContent='UNAVAILABLE';setVoice('idle','VOICE LINK / UNSUPPORTED','Voice input is unavailable.','Use the text field. Speech recognition support varies by browser.');return}recognition=new SR();recognition.lang=navigator.language||'en-US';recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;recognition.onstart=()=>{listening=true;mic.textContent='■ STOP LISTENING';mic.classList.add('active');window.speechSynthesis?.cancel();setVoice('listening','MIC ACTIVE / LISTENING','I’m listening.','Speak your request. Press Stop Listening to end capture.');$('#transcript').textContent='Listening for your request…'};recognition.onresult=e=>{const results=Array.from(e.results),finalText=results.filter(r=>r.isFinal).map(r=>r[0]?.transcript||'').join(' ').trim(),partial=results.filter(r=>!r.isFinal).map(r=>r[0]?.transcript||'').join(' ').trim();if(partial)$('#transcript').textContent=`HEARING: ${partial}`;if(finalText){$('#input').value=finalText;$('#transcript').textContent=`YOU: ${finalText}`;recognition.stop();send(finalText)}};recognition.onerror=e=>{listening=false;mic.textContent='◉ TALK TO MAYA';mic.classList.remove('active');setVoice('error','MIC / '+String(e.error||'ERROR').toUpperCase(),'I could not hear that request.','Check browser microphone permission or switch to text input.');addFeed(`Speech recognition error: ${e.error||'unknown'}`,'error')};recognition.onend=()=>{listening=false;mic.textContent='◉ TALK TO MAYA';mic.classList.remove('active');if(voiceMode==='listening')setVoice('idle','VOICE LINK / IDLE','Standing by.','Talk to MAYA or enter a text request.')};mic.onclick=()=>{if(listening){recognition.stop();return}try{recognition.start()}catch{setVoice('error','MIC / NOT READY','Microphone is unavailable.','Wait briefly and try again, or use text input.')}}}
+function switchView(name){$$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$$('[data-view-panel]').forEach(v=>v.classList.toggle('active',v.dataset.viewPanel===name));$('#crumb-view').textContent=name.replaceAll('-',' ').toUpperCase();if(name==='settings')$('#backend-input').value=backend;location.hash=name}
+$('#nav').addEventListener('click',e=>{const btn=e.target.closest('button[data-view]');if(btn)switchView(btn.dataset.view)});
+$('#chat-form').addEventListener('submit',e=>{e.preventDefault();send($('#input').value)});
+$('#stopSpeech').onclick=()=>{window.speechSynthesis?.cancel();if(!listening)setVoice('idle','VOICE LINK / IDLE','Audio stopped.','Spoken output was interrupted.')};$('#speech-replies').checked=speakReplies;$('#speech-replies').onchange=e=>{speakReplies=e.target.checked;localStorage.setItem('maya_speak',String(speakReplies));if(!speakReplies)window.speechSynthesis?.cancel()};
+$('#settings-form').onsubmit=e=>{e.preventDefault();try{backend=safeBackend($('#backend-input').value.trim());localStorage.setItem('maya_backend',backend);addFeed('Backend URL updated in this browser.');checkBackend();toast('Saved backend address.')}catch(error){toast(error.message)}};
+$('#clear-history').onclick=()=>{if(!confirm('Clear this browser’s saved conversation and session run list? Backend trace files will remain.'))return;history=[];runs=[];persist();addFeed('Local browser history cleared. Backend traces were not changed.');toast('Local history cleared.')};
+$('#stopSpeech').setAttribute('aria-label','Stop spoken audio');$('#clock').textContent=now();setInterval(()=>$('#clock').textContent=now(),1000);setupVoice();persist();checkBackend();setInterval(checkBackend,15000);addFeed('MAYA dashboard ready. Voice is opt-in; remote feeds remain disconnected.');
+function startCore(){const canvas=$('#core-canvas'),ctx=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)');let w=0,h=0,frame=0,staticMode=reduced.matches;const points=Array.from({length:58},(_,i)=>({a:i*2.399,r:.19+(i%13)*.026,s:.8+(i%3)*.45,v:.00007+(i%7)*.000018}));function resize(){const b=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);w=b.width;h=b.height;canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);if(staticMode)draw(0)}function draw(t){ctx.clearRect(0,0,w,h);const colors=voiceMode==='thinking'?[190,138,255]:voiceMode==='speaking'?[255,159,67]:voiceMode==='listening'?[0,255,200]:[53,232,255];const [r,g,b]=colors;ctx.save();ctx.translate(w/2,h/2);const amp=voiceMode==='listening'?1.35:voiceMode==='speaking'?1.5:voiceMode==='thinking'?.75:.5;for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,w*(.28+i*.1),h*(.13+i*.085),t*.00012*(i%2?-1:1),0,Math.PI*2);ctx.strokeStyle=`rgba(${r},${g},${b},${.21-i*.04})`;ctx.lineWidth=.65;ctx.stroke()}for(let i=0;i<points.length;i++){const p=points[i],a=p.a+t*p.v*amp,rr=Math.min(w,h)*p.r;ctx.beginPath();ctx.arc(Math.cos(a)*rr*.79,Math.sin(a)*rr*.52,p.s,0,Math.PI*2);ctx.fillStyle=`rgba(${r},${g},${b},${.25+Math.sin(t*.001+i)*.2})`;ctx.fill()}ctx.restore();if(!staticMode)frame=requestAnimationFrame(draw)}new ResizeObserver(resize).observe(canvas.parentElement);reduced.addEventListener?.('change',e=>{staticMode=e.matches;cancelAnimationFrame(frame);if(staticMode)draw(0);else frame=requestAnimationFrame(draw)});resize();if(!staticMode)frame=requestAnimationFrame(draw)}startCore();
+if(location.hash){const view=location.hash.slice(1);if($(`[data-view="${CSS.escape(view)}"]`))switchView(view)}
 </script>
 </body>
 </html>
