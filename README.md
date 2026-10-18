@@ -62,3 +62,8 @@ Built by CodesbyFebin · systems that prove what happened.
 ---
 
 This documentation is written to describe the MAYA Agentic Harness in full. It covers the purpose of an agentic harness, the features of the current release, the quick start path, the project structure, the architecture, the workflows, the tools, the memory and evidence system, the branding, and the roadmap. The goal is that an operator can understand the system, run it locally, inspect its behavior, and extend it while remaining confident that every action can be verified after the fact.
+
+
+## GitHub Pages
+
+MAYA's public static showcase is published at <https://codesbyfebin.github.io/Maya-Agentic-Harness/>. The hosted console starts disconnected and does not probe visitors' localhost. A backend URL must be configured explicitly, and the backend must allow the Pages origin in its CORS policy. The local dashboard served from `127.0.0.1:5500` remains the intended operator console.

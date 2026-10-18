@@ -1,36 +1,292 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAYA Agentic Harness</title>
-  <meta name="description" content="Local-first personal AI command center and agentic harness. Systems that prove what happened." />
-  <meta property="og:title" content="MAYA Agentic Harness" />
-  <meta property="og:description" content="JARVIS-style dashboard + agent runtime for OpenJarvis and OpenAI-compatible backends." />
-  <meta property="og:image" content="https://codesbyfebin.github.io/Maya-Agentic-Harness/og.png" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MAYA Agentic Harness" />
-  <meta name="twitter:description" content="Local-first AI command center that proves what happened." />
-  <meta name="twitter:image" content="https://codesbyfebin.github.io/Maya-Agentic-Harness/og.png" />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050a0e">
+  <meta name="description" content="MAYA — local-first, evidence-first agent command center by CodesbyFebin.">
+  <title>MAYA // Agent Command Center</title>
   <style>
-    :root { --bg:#010409; --accent:#00ff00; --cyan:#00e5ff; --text:#e6edf3; }
-    body { background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; margin:0; line-height:1.6; }
-    .wrap { max-width:900px; margin:0 auto; padding:4rem 1.5rem; }
-    h1 { color:var(--accent); font-size:2.8rem; margin-bottom:0.5rem; }
-    .tag { color:var(--cyan); font-size:1.1rem; margin-bottom:2rem; }
-    a { color:var(--cyan); }
-    .cta { display:inline-block; background:#00ff00; color:#010409; padding:0.8rem 1.6rem; border-radius:6px; font-weight:600; margin-top:1.5rem; text-decoration:none; }
+    :root{color-scheme:dark;--bg:#05090d;--panel:rgba(8,17,23,.92);--panel2:#0a141a;--line:rgba(63,224,205,.18);--linehot:rgba(63,224,205,.5);--mint:#58f5d0;--cyan:#45d9f5;--blue:#8bbaff;--text:#d7e9e8;--muted:#789494;--faint:#46615f;--amber:#ffc56d;--red:#ff7187;--green:#75f5a8;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--display:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px}body{min-height:100vh;background:radial-gradient(ellipse at 51% 42%,rgba(19,70,72,.24),transparent 38%),radial-gradient(ellipse at 85% 3%,rgba(18,69,90,.15),transparent 27%),#05090d}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(77,241,214,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(77,241,214,.025) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,black,transparent 85%)}body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(107,240,220,.012) 4px)}
+    button,input,textarea{font:inherit}button{color:inherit}.shell{position:relative;z-index:1;max-width:1680px;margin:0 auto;padding:16px 22px 24px}.topbar{height:53px;display:flex;align-items:center;gap:22px;border-bottom:1px solid var(--line);margin-bottom:17px}.brand{display:flex;align-items:center;gap:11px;min-width:220px}.brand-mark{width:30px;height:30px;border:1px solid var(--mint);border-radius:50%;position:relative;box-shadow:0 0 16px #58f5d033,inset 0 0 10px #58f5d022}.brand-mark:before,.brand-mark:after{content:"";position:absolute;inset:6px;border:1px solid var(--cyan);border-radius:50%}.brand-mark:after{inset:12px;background:var(--mint);box-shadow:0 0 9px var(--mint)}.brand-name{font:700 18px var(--display);letter-spacing:.21em;color:#e5fffa}.brand-name span{color:var(--mint)}.brand-sub{font-size:9px;letter-spacing:.18em;color:var(--muted);margin-top:3px}.nav{display:flex;gap:8px;align-items:center}.nav a{color:var(--muted);text-decoration:none;padding:8px 10px;font-size:10px;letter-spacing:.11em;text-transform:uppercase;border-bottom:1px solid transparent}.nav a.active,.nav a:hover{color:var(--mint);border-color:var(--mint)}.top-meta{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted);font-size:10px}.status{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:var(--faint);box-shadow:0 0 7px currentColor}.dot.online{background:var(--green);color:var(--green)}.dot.offline{background:var(--red);color:var(--red)}.dot.pending{background:var(--amber);color:var(--amber)}.icon-btn,.btn{border:1px solid var(--line);background:rgba(8,26,30,.65);padding:8px 11px;border-radius:3px;cursor:pointer;color:var(--muted);transition:.18s}.icon-btn:hover,.btn:hover{border-color:var(--mint);color:var(--mint);box-shadow:0 0 13px #58f5d019}.btn.primary{background:rgba(43,194,160,.12);border-color:#58f5d077;color:var(--mint)}.btn.danger:hover{border-color:var(--red);color:var(--red)}
+    .eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}.title-row{display:flex;align-items:end;justify-content:space-between;margin:22px 2px 16px}.title-row h1{font:600 23px var(--display);letter-spacing:.025em;margin:5px 0 0}.title-row h1 em{font-style:normal;color:var(--mint)}.title-note{color:var(--muted);font-size:11px;line-height:1.7}.layout{display:grid;grid-template-columns:minmax(205px, .78fr) minmax(440px, 1.8fr) minmax(260px, .95fr);gap:14px;align-items:stretch}.column{display:flex;flex-direction:column;gap:14px;min-width:0}.panel{background:linear-gradient(145deg,rgba(10,22,27,.96),rgba(5,13,18,.93));border:1px solid var(--line);position:relative;min-width:0;box-shadow:0 8px 28px #0005}.panel:before{content:"";position:absolute;left:-1px;top:-1px;width:28px;height:1px;background:var(--mint);box-shadow:0 0 9px var(--mint)}.panel-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 11px;border-bottom:1px solid rgba(63,224,205,.11)}.panel-title{color:#b9d7d4;font-size:10px;letter-spacing:.14em;text-transform:uppercase}.panel-code{color:var(--faint);font-size:9px}.panel-body{padding:14px}.left-stack .panel:first-child{min-height:272px}.health-big{display:flex;align-items:center;gap:13px;margin:5px 0 17px}.health-ring{width:56px;height:56px;border-radius:50%;border:1px solid #58f5d099;display:grid;place-items:center;position:relative;box-shadow:0 0 20px #58f5d018,inset 0 0 18px #58f5d012}.health-ring:before{content:"";position:absolute;inset:5px;border:1px dashed #45d9f555;border-radius:50%;animation:spin 18s linear infinite}.health-ring span{font-size:10px;color:var(--mint)}@keyframes spin{to{transform:rotate(360deg)}}.health-label strong{display:block;color:#d9eeea;font:600 14px var(--display);margin-bottom:5px}.health-label small{color:var(--muted);font-size:10px}.kv{display:grid;grid-template-columns:1fr auto;gap:8px 10px;padding:9px 0;border-top:1px solid rgba(63,224,205,.08);font-size:10px}.kv span:first-child{color:var(--muted)}.kv span:last-child{color:#b4ceca;text-align:right;overflow-wrap:anywhere}.endpoint{color:var(--cyan)!important;max-width:165px}.tool-row{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid rgba(63,224,205,.08)}.tool-row:last-child{border:0}.tool-icon{width:26px;height:26px;border:1px solid var(--linehot);display:grid;place-items:center;color:var(--mint);font-size:12px}.tool-name{color:#cbe0dd;font-size:11px}.tool-desc{color:var(--muted);font-size:9px;margin-top:4px}.readonly{margin-left:auto;border:1px solid #83b6a52a;padding:3px 5px;border-radius:2px;color:#88b89f;font-size:8px;letter-spacing:.08em}.local-note{color:var(--muted);font-size:10px;line-height:1.7}.local-note strong{color:var(--mint);font-weight:500}
+    .center{min-height:680px;display:flex;flex-direction:column;overflow:hidden}.center:after{content:"";position:absolute;width:350px;height:350px;left:50%;top:35%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(69,217,245,.08);pointer-events:none;box-shadow:0 0 0 28px rgba(69,217,245,.018),0 0 0 56px rgba(69,217,245,.014)}.center-top{position:relative;z-index:1;text-align:center;padding:25px 20px 10px}.core{height:126px;width:126px;margin:2px auto 13px;border-radius:50%;position:relative;display:grid;place-items:center;border:1px solid #58f5d077;background:radial-gradient(circle,#1a4847 0,#0b2228 43%,#09151c 70%);box-shadow:0 0 33px #58f5d023,inset 0 0 26px #45d9f518}.core:before,.core:after{content:"";position:absolute;inset:-9px;border:1px solid #58f5d044;border-radius:50%;border-left-color:transparent;animation:spin 16s linear infinite}.core:after{inset:-17px;border-color:#45d9f522;border-top-color:#45d9f588;animation-duration:25s;animation-direction:reverse}.core-inner{font:700 23px var(--display);letter-spacing:.12em;color:#d5fff5;text-shadow:0 0 15px #58f5d088}.core-caption{color:var(--mint);font-size:9px;letter-spacing:.23em;text-transform:uppercase}.core-caption small{display:block;color:var(--muted);letter-spacing:.1em;margin-top:6px}.suggestions{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:17px}.suggestion{font-size:9px;background:#071419;border:1px solid var(--line);padding:7px 9px;color:#91b6b1;cursor:pointer;border-radius:2px}.suggestion:hover{color:var(--mint);border-color:var(--linehot)}.conversation{position:relative;z-index:1;flex:1;overflow:auto;padding:17px 20px 10px;min-height:170px;max-height:330px;border-top:1px solid rgba(63,224,205,.1);scrollbar-color:#245851 transparent;scrollbar-width:thin}.empty-state{height:100%;min-height:140px;display:grid;place-content:center;text-align:center;color:var(--muted);gap:8px;font-size:11px}.empty-state strong{font:500 13px var(--display);color:#b8d8d4}.msg{margin:0 auto 13px;max-width:760px}.msg-meta{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:5px}.msg.user .msg-meta{color:var(--cyan)}.msg-body{white-space:pre-wrap;overflow-wrap:anywhere;color:#d0e4e1;line-height:1.65;font:12px/1.65 var(--mono);padding:10px 12px;background:#071116;border-left:2px solid #225b55}.msg.user .msg-body{border-color:#45d9f5;background:#071219}.msg.error .msg-body{border-color:var(--red);color:#ffd6dc}.composer-wrap{position:relative;z-index:1;padding:12px 17px 15px;border-top:1px solid rgba(63,224,205,.12);background:rgba(3,10,14,.72)}.composer{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--linehot);padding:7px;background:#061015;box-shadow:0 0 18px #58f5d00c}.composer:focus-within{box-shadow:0 0 18px #58f5d024}.composer textarea{flex:1;resize:vertical;min-height:42px;max-height:130px;border:0;outline:0;background:transparent;color:var(--text);padding:6px;font:12px/1.5 var(--mono)}.composer textarea::placeholder{color:#54716f}.send-btn{align-self:stretch;min-width:75px;border:1px solid #58f5d077;background:#0d342f;color:var(--mint);letter-spacing:.1em;font-size:10px;cursor:pointer}.send-btn:disabled{opacity:.5;cursor:wait}.composer-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--faint);font-size:9px}.voice-note{display:none;color:var(--amber)}.voice-note.show{display:block}
+    .activity-list{max-height:350px;overflow:auto}.event{padding:10px 0;border-bottom:1px solid rgba(63,224,205,.08)}.event:last-child{border:0}.event-top{display:flex;align-items:center;gap:8px}.event-type{font-size:10px;color:#c1d9d6}.event-time{margin-left:auto;font-size:9px;color:var(--faint)}.event-state{font-size:8px;text-transform:uppercase;letter-spacing:.08em;padding:3px 5px;border:1px solid var(--line);color:var(--muted)}.event-state.success{color:var(--green);border-color:#75f5a833}.event-state.denied,.event-state.error{color:var(--red);border-color:#ff718733}.event-detail{font-size:9px;line-height:1.55;color:var(--muted);margin:6px 0 0;overflow-wrap:anywhere}.empty-events{color:var(--muted);font-size:10px;line-height:1.7;padding:7px 0}.receipt-run{font-size:10px;color:var(--cyan);overflow-wrap:anywhere}.receipt-status{display:flex;align-items:center;gap:8px;margin-bottom:12px}.receipt-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}.receipt-actions .btn{font-size:9px}.verify-hint{font-size:9px;color:var(--muted);line-height:1.6;margin-top:12px}.verify-hint code{color:#bce4d9}.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:15px;padding:12px 2px 0;color:var(--faint);font-size:9px;letter-spacing:.08em}.footer a{color:var(--muted);text-decoration:none}.footer a:hover{color:var(--mint)}.settings{display:none;position:fixed;inset:0;z-index:50;background:#0009;place-items:center;padding:18px}.settings.open{display:grid}.settings-card{width:min(480px,100%);background:#081318;border:1px solid var(--linehot);box-shadow:0 15px 60px #000b;padding:20px}.settings-card h2{font:600 15px var(--display);margin:0 0 8px}.settings-card p{color:var(--muted);font-size:10px;line-height:1.6}.settings-card label{display:block;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:15px 0 6px}.settings-card input{width:100%;background:#030a0e;border:1px solid var(--line);padding:10px;color:var(--text);outline:0}.settings-card input:focus{border-color:var(--mint)}.settings-buttons{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    @media(max-width:1050px){.layout{grid-template-columns:minmax(190px,.8fr) minmax(400px,1.5fr)}.right-stack{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.center{grid-row:span 1}.center:after{top:27%}}
+    @media(max-width:700px){.shell{padding:10px}.topbar{gap:8px}.brand{min-width:0}.brand-sub,.nav,.top-meta .time{display:none}.top-meta{gap:9px}.title-row{margin-top:16px}.title-row h1{font-size:19px}.title-note{display:none}.layout{display:flex;flex-direction:column}.center{order:0;min-height:600px}.left-stack{order:1;display:grid;grid-template-columns:1fr 1fr}.right-stack{order:2;display:flex}.panel{width:100%}.left-stack .panel:first-child{min-height:0}.health-big{margin-bottom:10px}.kv{gap:6px}.endpoint{max-width:125px}.footer{gap:12px;line-height:1.5}.core{height:110px;width:110px}.center-top{padding-top:20px}.conversation{max-height:300px}.right-stack .panel{min-height:0}}
+    @media(max-width:420px){.left-stack{grid-template-columns:1fr}.brand-name{font-size:16px}.center{min-height:620px}.suggestion{font-size:8px}.top-meta{font-size:9px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>MAYA</h1>
-    <p class="tag">Agentic Harness · systems that prove what happened</p>
-    <p>Local-first personal AI command center that sits on top of OpenJarvis or any OpenAI-compatible backend. Voice, workflows, evidence traces, and a dark cyan dashboard.</p>
-    <a class="cta" href="https://github.com/CodesbyFebin/Maya-Agentic-Harness">View on GitHub</a>
-    <p style="margin-top:3rem;color:#8b949e;font-size:0.9rem;">Built by CodesbyFebin</p>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="MAYA by CodesbyFebin"><div class="brand-mark" aria-hidden="true"></div><div><div class="brand-name">MAYA<span>.</span></div><div class="brand-sub">CODESBYFEBIN // AGENTIC HARNESS</div></div></div>
+      <nav class="nav" aria-label="Main navigation"><a class="active" href="#command">Command</a><a href="#activity">Run activity</a><a href="#evidence">Evidence</a></nav>
+      <div class="top-meta"><span class="status"><i id="status-dot" class="dot pending"></i><span id="status-text">CHECKING BACKEND</span></span><span class="time" id="clock">--:--:-- UTC</span><button class="icon-btn" id="settings-open" type="button" aria-label="Backend settings">⚙</button></div>
+    </header>
+    <div class="title-row" id="command"><div><div class="eyebrow">LOCAL OPERATOR CONSOLE · EVIDENCE FIRST</div><h1>Agent <em>Command</em> Center</h1></div><div class="title-note">Observe the request. Inspect the tool calls.<br>Verify the run record on your machine.</div></div>
+    <main class="layout">
+      <aside class="column left-stack" aria-label="Runtime and available tools">
+        <section class="panel"><div class="panel-head"><span class="panel-title">Runtime link</span><span class="panel-code">SYS / 01</span></div><div class="panel-body"><div class="health-big"><div class="health-ring"><span id="health-glyph">···</span></div><div class="health-label"><strong id="health-name">Connecting</strong><small id="health-mode">Checking configured backend</small></div></div><div class="kv"><span>Backend</span><span id="backend-label" class="endpoint">127.0.0.1:8001</span><span>Runtime mode</span><span id="runtime-mode">—</span><span>Last check</span><span id="health-checked">—</span></div><button id="health-refresh" class="btn" type="button" style="width:100%;margin-top:12px;font-size:9px">↻ &nbsp; RECHECK CONNECTION</button></div></section>
+        <section class="panel"><div class="panel-head"><span class="panel-title">Policy-bound tools</span><span class="panel-code">READ ONLY</span></div><div class="panel-body"><div class="tool-row"><span class="tool-icon">⌕</span><div><div class="tool-name">list_dir</div><div class="tool-desc">Workspace directory listing</div></div><span class="readonly">BOUNDED</span></div><div class="tool-row"><span class="tool-icon">▤</span><div><div class="tool-name">read_file</div><div class="tool-desc">Size-limited file reads</div></div><span class="readonly">BOUNDED</span></div><div class="tool-row"><span class="tool-icon">›_</span><div><div class="tool-name">terminal_run</div><div class="tool-desc">Argument-policy allowlist</div></div><span class="readonly">BOUNDED</span></div><p class="local-note"><strong>No write tool is registered.</strong> Tools are checked by policy and logged to the local evidence trace.</p></div></section>
+      </aside>
+      <section class="panel center" aria-label="MAYA conversation">
+        <div class="center-top"><div class="core" aria-hidden="true"><div class="core-inner">M</div></div><div class="core-caption">MAYA // READY<small>LOCAL-FIRST · TRACE-EMITTING RUNTIME</small></div><div class="suggestions"><button class="suggestion" type="button" data-prompt="What tools are available in this runtime?">Inspect available tools</button><button class="suggestion" type="button" data-prompt="Summarize the files in my allowed workspace.">Summarize workspace</button><button class="suggestion" type="button" data-prompt="Explain how I can verify a MAYA evidence trace.">How to verify a trace</button></div></div>
+        <div id="conversation" class="conversation" aria-live="polite"><div class="empty-state" id="empty-state"><strong>Awaiting operator input</strong><span>Ask a question to start an auditable run.</span></div></div>
+        <div class="composer-wrap"><form id="chat-form"><div class="composer"><textarea id="prompt" rows="1" maxlength="20000" aria-label="Message MAYA" placeholder="Enter a request for MAYA…"></textarea><button type="button" class="icon-btn" id="voice-btn" aria-label="Use voice input" title="Voice input">🎙</button><button class="send-btn" id="send-btn" type="submit">SEND ↗</button></div></form><div class="composer-footer"><span id="voice-note" class="voice-note">Voice input unavailable here; text input still works.</span><span id="run-hint">Requests are sent to your configured backend.</span><span>ENTER TO SEND · SHIFT+ENTER NEW LINE</span></div></div>
+      </section>
+      <aside class="column right-stack" aria-label="Run activity and evidence">
+        <section class="panel" id="activity"><div class="panel-head"><span class="panel-title">Run activity</span><span id="event-count" class="panel-code">0 EVENTS</span></div><div class="panel-body activity-list" id="events"><div class="empty-events">Tool calls and model steps from the latest response will appear here.</div></div></section>
+        <section class="panel" id="evidence"><div class="panel-head"><span class="panel-title">Evidence receipt</span><span class="panel-code">EVIDENCE.V1</span></div><div class="panel-body"><div class="receipt-status"><i id="trace-dot" class="dot"></i><span id="trace-status" class="local-note">No run recorded in this session.</span></div><div class="eyebrow" style="margin-bottom:6px">LATEST RUN ID</div><div id="run-id" class="receipt-run">—</div><div class="eyebrow" style="margin:13px 0 6px">LOCAL TRACE FILE</div><div id="trace-path" class="receipt-run" style="color:var(--muted)">—</div><div class="receipt-actions"><button id="copy-path" class="btn" type="button" disabled>Copy path</button><button id="clear-history" class="btn danger" type="button">Clear chat</button></div><div class="verify-hint">MAYA writes a local hash-chained evidence record. Verify it from the repository root with <code>maya trace verify &lt;file&gt;</code>. The console does not claim a trace is verified.</div></div></section>
+        <section class="panel"><div class="panel-head"><span class="panel-title">Operator note</span><span class="panel-code">LOCAL</span></div><div class="panel-body local-note">The dashboard stores chat history in this browser. Evidence files are written by the backend on the machine running MAYA.</div></section>
+      </aside>
+    </main>
+    <footer class="footer"><span>SYSTEMS THAT PROVE WHAT HAPPENED</span><span>BUILT BY <a href="https://github.com/CodesbyFebin" target="_blank" rel="noreferrer">CODESBYFEBIN</a> · MAYA AGENTIC HARNESS</span></footer>
   </div>
+  <div class="settings" id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div class="settings-card"><h2 id="settings-title">Backend connection</h2><p>Choose the MAYA HTTP backend URL. The tool-enabled backend defaults to port 8001; the echo stub usually runs on port 8000. A public Pages preview stays disconnected until you enter a backend explicitly; its CORS policy must allow the Pages origin.</p><label for="backend-url">Backend base URL</label><input id="backend-url" type="url" inputmode="url" spellcheck="false" placeholder="http://127.0.0.1:8001"><div class="settings-buttons"><button class="btn" id="settings-cancel" type="button">Cancel</button><button class="btn primary" id="settings-save" type="button">Save and check</button></div></div></div>
+  <script>
+    (() => {
+      "use strict";
+      const DEFAULT_BACKEND = "http://127.0.0.1:8001";
+      const PAGES_SHOWCASE = location.hostname.endsWith(".github.io");
+      const HISTORY_KEY = "maya-chat-history-v1";
+      const BACKEND_KEY = "maya-backend-url-v1";
+      const MAX_HISTORY = 80;
+      const $ = (id) => document.getElementById(id);
+      const conversation = $("conversation");
+      let backend = PAGES_SHOWCASE ? "" : DEFAULT_BACKEND;
+      let messages = [];
+      let recognition = null;
+      let sending = false;
+
+      function safeBackend(value) {
+        try {
+          const u = new URL(value);
+          return ["http:", "https:"].includes(u.protocol) ? u.origin.replace(/\/$/, "") : "";
+        } catch { return ""; }
+      }
+      function addBubble(role, content, {persist = true, error = false} = {}) {
+        const empty = $("empty-state");
+        if (empty) empty.remove();
+        const wrap = document.createElement("article");
+        wrap.className = `msg ${role}${error ? " error" : ""}`;
+        const meta = document.createElement("div");
+        meta.className = "msg-meta";
+        meta.textContent = `${role === "user" ? "OPERATOR" : role === "error" ? "CONNECTION" : "MAYA"} · ${new Date().toLocaleTimeString()}`;
+        const body = document.createElement("div");
+        body.className = "msg-body";
+        body.textContent = String(content ?? "");
+        wrap.append(meta, body);
+        conversation.append(wrap);
+        conversation.scrollTop = conversation.scrollHeight;
+        if (persist) {
+          messages.push({role, content: String(content ?? "")});
+          messages = messages.filter((m) => m.role === "user" || m.role === "assistant").slice(-MAX_HISTORY);
+          try { localStorage.setItem(HISTORY_KEY, JSON.stringify(messages)); } catch { /* browser storage may be unavailable */ }
+        }
+      }
+      function restoreHistory() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+          if (!Array.isArray(stored)) return;
+          messages = stored.filter((m) => m && ["user", "assistant"].includes(m.role) && typeof m.content === "string").slice(-MAX_HISTORY);
+          // Render only: restoring must never append duplicates to localStorage.
+          for (const message of messages) addBubble(message.role, message.content, {persist: false});
+        } catch { messages = []; }
+      }
+      function setBackendLabel() {
+        if (!backend) { $("backend-label").textContent = "SHOWCASE / NOT CONNECTED"; return; }
+        const u = new URL(backend);
+        $("backend-label").textContent = `${u.hostname}${u.port ? `:${u.port}` : ""}`;
+      }
+      async function checkHealth() {
+        const dot = $("status-dot");
+        if (!backend) {
+          dot.className = "dot";
+          $("status-text").textContent = "SHOWCASE MODE";
+          $("health-name").textContent = "Preview only";
+          $("health-glyph").textContent = "UI";
+          $("health-mode").textContent = "No backend configured";
+          $("runtime-mode").textContent = "not connected";
+          $("health-checked").textContent = "—";
+          return;
+        }
+        dot.className = "dot pending";
+        $("status-text").textContent = "CHECKING BACKEND";
+        $("health-name").textContent = "Connecting";
+        $("health-glyph").textContent = "···";
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3500);
+        try {
+          const response = await fetch(`${backend}/health`, {signal: controller.signal, cache: "no-store"});
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const healthy = data.status === "ok";
+          dot.className = `dot ${healthy ? "online" : "offline"}`;
+          $("status-text").textContent = healthy ? "BACKEND ONLINE" : "BACKEND NOT READY";
+          $("health-name").textContent = healthy ? "Connected" : "Not ready";
+          $("health-glyph").textContent = healthy ? "OK" : "!";
+          $("health-mode").textContent = data.service || "MAYA backend";
+          $("runtime-mode").textContent = data.mode || "connected";
+        } catch (error) {
+          dot.className = "dot offline";
+          $("status-text").textContent = "BACKEND OFFLINE";
+          $("health-name").textContent = "Unavailable";
+          $("health-glyph").textContent = "×";
+          $("health-mode").textContent = error.name === "AbortError" ? "Health check timed out" : "Could not reach /health";
+          $("runtime-mode").textContent = "offline";
+        } finally {
+          clearTimeout(timer);
+          $("health-checked").textContent = new Date().toLocaleTimeString();
+        }
+      }
+      function renderEvents(events) {
+        const host = $("events");
+        host.replaceChildren();
+        const list = Array.isArray(events) ? events : [];
+        $("event-count").textContent = `${list.length} EVENT${list.length === 1 ? "" : "S"}`;
+        if (!list.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-events";
+          empty.textContent = "No tool or model events were returned for this response.";
+          host.append(empty);
+          return;
+        }
+        for (const item of list.slice(-30)) {
+          const event = document.createElement("div");
+          event.className = "event";
+          const top = document.createElement("div");
+          top.className = "event-top";
+          const type = document.createElement("span");
+          type.className = "event-type";
+          type.textContent = String(item.tool || item.event || item.type || "event");
+          const state = document.createElement("span");
+          state.className = `event-state ${item.status === "error" || item.status === "denied" ? item.status : item.status === "ok" || item.status === "success" ? "success" : ""}`;
+          state.textContent = String(item.status || "recorded");
+          const time = document.createElement("span");
+          time.className = "event-time";
+          time.textContent = String(item.timestamp || "");
+          top.append(type, state, time);
+          event.append(top);
+          if (item.policy_reason_code || item.detail || item.output_preview || item.error) {
+            const detail = document.createElement("p");
+            detail.className = "event-detail";
+            detail.textContent = String(item.policy_reason_code || item.detail || item.output_preview || item.error);
+            event.append(detail);
+          }
+          host.append(event);
+        }
+      }
+      function setReceipt(maya) {
+        const isTrace = maya && maya.execution_log === "evidence.v1";
+        $("trace-dot").className = `dot ${isTrace ? "online" : ""}`;
+        $("trace-status").textContent = isTrace ? "Evidence record saved by backend" : "This backend response did not include an evidence receipt.";
+        $("run-id").textContent = maya?.run_id || "—";
+        $("trace-path").textContent = maya?.log_path || "—";
+        $("copy-path").disabled = !maya?.log_path;
+        renderEvents(maya?.tool_events);
+      }
+      async function sendPrompt(text) {
+        const prompt = String(text || "").trim();
+        if (!prompt || sending) return;
+        if (!backend) {
+          addBubble("error", "Showcase mode is disconnected. Use ⚙ to configure a MAYA backend you control before sending a request.", {persist: false, error: true});
+          return;
+        }
+        sending = true;
+        $("send-btn").disabled = true;
+        addBubble("user", prompt);
+        $("prompt").value = "";
+        const pending = document.createElement("article");
+        pending.className = "msg assistant";
+        pending.innerHTML = '<div class="msg-meta">MAYA · PROCESSING</div><div class="msg-body">Waiting for the configured backend…</div>';
+        conversation.append(pending);
+        conversation.scrollTop = conversation.scrollHeight;
+        try {
+          const response = await fetch(`${backend}/v1/chat/completions`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({model: "auto", messages: messages.slice(-20).map(({role, content}) => ({role, content}))}),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.detail || `Backend returned HTTP ${response.status}`);
+          pending.remove();
+          const answer = payload.choices?.[0]?.message?.content ?? "The backend returned no message content.";
+          addBubble("assistant", answer);
+          setReceipt(payload.maya);
+          if (payload.maya?.status === "stub") $("trace-status").textContent = "Stub response — no agent evidence trace was emitted.";
+        } catch (error) {
+          pending.remove();
+          addBubble("error", `Request failed: ${error.message}. Check the backend URL and confirm the backend is running.`, {persist: false, error: true});
+          $("run-hint").textContent = "No successful response was received.";
+        } finally {
+          sending = false;
+          $("send-btn").disabled = false;
+          $("prompt").focus();
+        }
+      }
+      function setupVoice() {
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Speech) { $("voice-note").classList.add("show"); $("voice-btn").disabled = true; $("voice-btn").title = "Voice input is not supported in this browser"; return; }
+        recognition = new Speech();
+        recognition.lang = navigator.language || "en-US";
+        recognition.interimResults = false;
+        recognition.onresult = (event) => { $("prompt").value = event.results?.[0]?.[0]?.transcript || ""; $("prompt").focus(); };
+        recognition.onerror = () => { $("voice-note").textContent = "Voice input failed; you can continue with text."; $("voice-note").classList.add("show"); };
+        $("voice-btn").addEventListener("click", () => { try { recognition.start(); } catch { /* already listening */ } });
+      }
+      function updateClock() { $("clock").textContent = `${new Date().toISOString().slice(11,19)} UTC`; }
+
+      try {
+        const savedBackend = localStorage.getItem(BACKEND_KEY);
+        if (savedBackend) backend = safeBackend(savedBackend);
+      } catch { /* use the safe environment default */ }
+      setBackendLabel();
+      restoreHistory();
+      setupVoice();
+      updateClock();
+      setInterval(updateClock, 1000);
+      checkHealth();
+      setInterval(checkHealth, 30000);
+      $("health-refresh").addEventListener("click", checkHealth);
+      $("chat-form").addEventListener("submit", (event) => { event.preventDefault(); sendPrompt($("prompt").value); });
+      $("prompt").addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); $("chat-form").requestSubmit(); } });
+      document.querySelectorAll(".suggestion").forEach((button) => button.addEventListener("click", () => { $("prompt").value = button.dataset.prompt || ""; $("prompt").focus(); }));
+      $("settings-open").addEventListener("click", () => { $("backend-url").value = backend; $("settings").classList.add("open"); $("backend-url").focus(); });
+      $("settings-cancel").addEventListener("click", () => $("settings").classList.remove("open"));
+      $("settings").addEventListener("click", (event) => { if (event.target === $("settings")) $("settings").classList.remove("open"); });
+      $("settings-save").addEventListener("click", () => {
+        const input = $("backend-url").value.trim();
+        try {
+          const parsed = new URL(input);
+          if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("Use an http:// or https:// URL.");
+          backend = safeBackend(input);
+          try { localStorage.setItem(BACKEND_KEY, backend); } catch { /* settings still apply in this session */ }
+          setBackendLabel();
+          $("settings").classList.remove("open");
+          checkHealth();
+        } catch (error) { $("backend-url").setCustomValidity(error.message || "Enter a valid URL."); $("backend-url").reportValidity(); $("backend-url").setCustomValidity(""); }
+      });
+      $("clear-history").addEventListener("click", () => {
+        messages = [];
+        try { localStorage.removeItem(HISTORY_KEY); } catch { /* ignore */ }
+        conversation.replaceChildren();
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.id = "empty-state";
+        empty.innerHTML = "<strong>Awaiting operator input</strong><span>Ask a question to start an auditable run.</span>";
+        conversation.append(empty);
+      });
+      $("copy-path").addEventListener("click", async () => {
+        const value = $("trace-path").textContent;
+        if (!value || value === "—") return;
+        try { await navigator.clipboard.writeText(value); $("copy-path").textContent = "Copied"; setTimeout(() => $("copy-path").textContent = "Copy path", 1200); }
+        catch { $("copy-path").textContent = "Copy unavailable"; setTimeout(() => $("copy-path").textContent = "Copy path", 1500); }
+      });
+    })();
+  </script>
 </body>
 </html>
