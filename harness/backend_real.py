@@ -35,6 +35,7 @@ MAX_TOOL_ROUNDS = int(os.environ.get("MAYA_MAX_TOOL_ROUNDS", "5"))
 MAX_QUERY_CHARS = 20_000
 MAX_TOOL_RESULT_CHARS = 10_000
 EVENT_QUEUE_SIZE = 100
+EVENT_PROTOCOL = "maya.events.v1"
 TRACE_DIR = Path(os.environ.get("MAYA_TRACE_DIR", str(Path(__file__).parent / "traces")))
 
 TOOLS: list[dict[str, Any]] = [
@@ -109,6 +110,8 @@ def run_agent(
             name = call["function"]["name"]
             args = json.loads(call["function"]["arguments"] or "{}")
             call_id = call["id"]
+            denied = False
+            error_type = None
             try:
                 result = TOOL_FUNCTIONS[name](**args)
                 result_str = json.dumps(result) if not isinstance(result, str) else result
@@ -117,11 +120,15 @@ def run_agent(
             except Exception as exc:
                 result_str = f"Error: {exc}"
                 status = "error"
+                denied = isinstance(exc, PermissionError)
+                error_type = type(exc).__name__
             event = {"round": round_num, "tool": name, "status": status, "args": args}
             events.append(event)
             if emit:
                 # Do not broadcast tool arguments or file contents to dashboard clients.
-                emit({"type": "tool_event", "task_id": run_id, "tool": name, "status": status, "round": round_num})
+                if denied:
+                    emit({"type": "policy_denied", "task_id": run_id, "tool": name, "status": "denied", "decision": "deny", "policy_reason_code": "permission_denied"})
+                emit({"type": "tool_event", "task_id": run_id, "tool": name, "status": status, "round": round_num, "error_type": error_type})
             messages.append({"role": "tool", "tool_call_id": call_id, "name": name, "content": result_str})
     return "Stopped: no final answer was produced.", events
 
@@ -193,15 +200,32 @@ app.add_middleware(
 )
 
 
+def health_snapshot() -> dict[str, Any]:
+    return {
+        "status": "ok",
+        "service": "maya-agent-backend",
+        "mode": "tool-loop",
+        "model": LLM_MODEL,
+        "endpoint_kind": "openai-compatible",
+        "trace_schema": "execution_log_unverified",
+        "websocket_protocol": EVENT_PROTOCOL,
+        "tools": sorted(TOOL_FUNCTIONS),
+    }
+
+
+def origin_is_allowed(websocket: WebSocket) -> bool:
+    origin = websocket.headers.get("origin")
+    return not origin or origin in allowed_origins
+
+
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "maya-agent-backend", "mode": "tool-loop"}
+async def health() -> dict[str, Any]:
+    return health_snapshot()
 
 
 @app.websocket("/ws")
 async def live_events(websocket: WebSocket) -> None:
-    origin = websocket.headers.get("origin")
-    if origin and origin not in allowed_origins:
+    if not origin_is_allowed(websocket):
         await websocket.close(code=1008, reason="Origin not allowed")
         return
 
@@ -238,6 +262,119 @@ async def live_events(websocket: WebSocket) -> None:
         event_hub.unsubscribe(queue)
 
 
+def versioned_frame(event: dict[str, Any]) -> dict[str, Any] | None:
+    event_type = event.get("type")
+    frame_type: str | None = None
+    data: dict[str, Any] = {}
+    if event_type == "agent_event" and event.get("action") == "working":
+        frame_type = "run_started"
+        data = {"event_type": "run_started", "kind": "agent_run", "status": "running"}
+    elif event_type == "tool_event":
+        frame_type = "tool_event"
+        data = {
+            "event_type": "tool_call",
+            "kind": "tool_event",
+            "tool": event.get("tool"),
+            "status": event.get("status"),
+            "round": event.get("round"),
+        }
+    elif event_type == "policy_denied":
+        frame_type = "policy_denied"
+        data = {
+            "event_type": "policy_denied",
+            "kind": "policy_decision",
+            "status": "denied",
+            "decision": "deny",
+            "tool": event.get("tool"),
+            "policy_reason_code": event.get("policy_reason_code"),
+        }
+    elif event_type == "task_update":
+        frame_type = "run_result"
+        data = {
+            "event_type": "run_result",
+            "kind": "run_result",
+            "status": "success" if event.get("status") == "done" else "failed",
+            "tool_events": event.get("tool_events", 0),
+            "trace_written": bool(event.get("trace_written", False)),
+        }
+    if frame_type is None:
+        return None
+    return {
+        "protocol": EVENT_PROTOCOL,
+        "type": frame_type,
+        "run_id": event.get("task_id"),
+        "seq": event.get("seq"),
+        "timestamp": event.get("timestamp"),
+        "data": data,
+    }
+
+
+@app.websocket("/v1/events")
+async def versioned_live_events(websocket: WebSocket) -> None:
+    if not origin_is_allowed(websocket):
+        await websocket.close(code=1008, reason="Origin not allowed")
+        return
+
+    await websocket.accept()
+    queue = event_hub.subscribe()
+    await websocket.send_json({
+        "protocol": EVENT_PROTOCOL,
+        "type": "hello",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data": {**health_snapshot(), "active_runs": list(active_runs.values())},
+    })
+    try:
+        for run in tuple(active_runs.values()):
+            await websocket.send_json({
+                "protocol": EVENT_PROTOCOL,
+                "type": "run_started",
+                "run_id": run["task_id"],
+                "timestamp": run["started_at"],
+                "data": {"event_type": "run_started", "kind": "agent_run", "status": "running"},
+            })
+        while True:
+            event_task = asyncio.create_task(queue.get())
+            receive_task = asyncio.create_task(websocket.receive())
+            done, pending = await asyncio.wait(
+                {event_task, receive_task}, timeout=20, return_when=asyncio.FIRST_COMPLETED
+            )
+            for task in pending:
+                task.cancel()
+            await asyncio.gather(*pending, return_exceptions=True)
+            if not done:
+                await websocket.send_json({
+                    "protocol": EVENT_PROTOCOL,
+                    "type": "heartbeat",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "data": {},
+                })
+                continue
+            if receive_task in done:
+                message = receive_task.result()
+                if message.get("type") == "websocket.disconnect":
+                    break
+                if message.get("text"):
+                    try:
+                        incoming = json.loads(message["text"])
+                    except json.JSONDecodeError:
+                        incoming = None
+                    if isinstance(incoming, dict) and incoming.get("type") == "ping":
+                        await websocket.send_json({
+                            "protocol": EVENT_PROTOCOL,
+                            "type": "heartbeat",
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                            "data": {"echo": True},
+                        })
+            if event_task in done:
+                frame = versioned_frame(event_task.result())
+                if frame:
+                    await websocket.send_json(frame)
+    except (WebSocketDisconnect, RuntimeError, OSError):
+        pass
+    finally:
+        event_hub.unsubscribe(queue)
+
+
 @app.post("/v1/chat/completions")
 async def chat_completions(request: ChatRequest) -> dict[str, Any]:
     messages = [message.model_dump() for message in request.messages]
@@ -263,13 +400,13 @@ async def chat_completions(request: ChatRequest) -> dict[str, Any]:
         )
     except Exception as exc:
         active_runs.pop(run_id, None)
-        await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "failed", "agent": "MAYA agent loop"})
+        await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "failed", "agent": "MAYA agent loop", "trace_written": False})
         await event_hub.publish({"type": "agent_event", "action": "error", "agent": "MAYA agent loop", "task_id": run_id, "error": "Configured model request failed"})
         detail = str(exc) if isinstance(exc, RuntimeError) else "Agent request failed unexpectedly"
         raise HTTPException(status_code=502, detail=detail) from exc
     log_path = write_execution_log(query, events, result)
     active_runs.pop(run_id, None)
-    await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "done", "agent": "MAYA agent loop", "tool_events": len(events)})
+    await event_hub.publish({"type": "task_update", "task_id": run_id, "title": "Agent request", "status": "done", "agent": "MAYA agent loop", "tool_events": len(events), "trace_written": bool(log_path)})
     await event_hub.publish({"type": "agent_event", "action": "complete", "agent": "MAYA agent loop", "task_id": run_id})
     return {
         "id": f"chatcmpl_{uuid.uuid4().hex}",
@@ -281,6 +418,7 @@ async def chat_completions(request: ChatRequest) -> dict[str, Any]:
             "message": {"role": "assistant", "content": result},
             "finish_reason": "stop",
         }],
-        "maya": {"run_id": run_id, "execution_log": "unverified", "log_path": log_path, "tool_events": events},
+        "maya": {"run_id": run_id, "status": "success", "execution_log": "unverified", "trace_written": bool(log_path), "log_path": log_path, "tool_events": events},
     }
+
 
