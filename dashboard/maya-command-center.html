@@ -42,7 +42,7 @@
       </section>
       <aside class="column right-stack" aria-label="Run activity and evidence">
         <section class="panel" id="activity"><div class="panel-head"><span class="panel-title">Run activity</span><span id="event-count" class="panel-code">0 EVENTS</span></div><div class="panel-body activity-list" id="events"><div class="empty-events">Tool calls and model steps from the latest response will appear here.</div></div></section>
-        <section class="panel" id="evidence"><div class="panel-head"><span class="panel-title">Evidence receipt</span><span class="panel-code">EVIDENCE.V1</span></div><div class="panel-body"><div class="receipt-status"><i id="trace-dot" class="dot"></i><span id="trace-status" class="local-note">No run recorded in this session.</span></div><div class="eyebrow" style="margin-bottom:6px">LATEST RUN ID</div><div id="run-id" class="receipt-run">—</div><div class="eyebrow" style="margin:13px 0 6px">LOCAL TRACE FILE</div><div id="trace-path" class="receipt-run" style="color:var(--muted)">—</div><div class="receipt-actions"><button id="copy-path" class="btn" type="button" disabled>Copy path</button><button id="clear-history" class="btn danger" type="button">Clear chat</button></div><div class="verify-hint">The configured backend reports its trace path and verification state. This console does not infer or claim trace verification.</div></div></section>
+        <section class="panel" id="evidence"><div class="panel-head"><span class="panel-title">Execution log</span><span class="panel-code">UNVERIFIED</span></div><div class="panel-body"><div class="receipt-status"><i id="trace-dot" class="dot"></i><span id="trace-status" class="local-note">No run recorded in this session.</span></div><div class="eyebrow" style="margin-bottom:6px">LATEST RUN ID</div><div id="run-id" class="receipt-run">—</div><div class="eyebrow" style="margin:13px 0 6px">LOCAL TRACE FILE</div><div id="trace-path" class="receipt-run" style="color:var(--muted)">—</div><div class="receipt-actions"><button id="copy-path" class="btn" type="button" disabled>Copy path</button><button id="clear-history" class="btn danger" type="button">Clear chat</button></div><div class="verify-hint">The configured backend reports its trace path and verification state. This console does not infer or claim trace verification.</div></div></section>
         <section class="panel"><div class="panel-head"><span class="panel-title">Operator note</span><span class="panel-code">LOCAL</span></div><div class="panel-body local-note">The dashboard stores chat history in this browser. Evidence files are written by the backend on the machine running MAYA.</div></section>
       </aside>
     </main>
@@ -173,13 +173,6 @@
           if (event.seq <= lastEventSeq) return;
           lastEventSeq = event.seq;
         }
-        if (event.type === "runtime_snapshot") {
-          updateLiveHealth(event);
-          for (const run of event.active_runs || []) {
-            addLiveEvent({event: "Agent request", status: "running", detail: String(run.task_id || ""), timestamp: run.started_at || event.timestamp});
-          }
-          return;
-        }
         if (event.type === "pong") return;
         if (event.type === "agent_event" && event.action === "working") {
           $("run-id").textContent = event.task_id || "—";
@@ -197,16 +190,37 @@
         if (event.type === "task_update") {
           const success = event.status === "done";
           addLiveEvent({event: "Agent request", status: success ? "success" : "error", detail: success ? `${event.tool_events || 0} tool event(s) completed` : "Backend reported request failure", timestamp: event.timestamp});
+          if (success && event.trace_written) {
+            $("trace-dot").className = "dot pending";
+            $("trace-status").textContent = "Execution log written · verification unverified.";
+          }
           if (!success) {
             $("trace-dot").className = "dot offline";
             $("trace-status").textContent = "Agent request failed; see the response in chat.";
           }
         }
       }
+      function handleLiveFrame(frame) {
+        if (!frame || frame.protocol !== "maya.events.v1") return;
+        const data = frame.data || {};
+        if (frame.type === "hello") {
+          updateLiveHealth(data);
+          for (const run of data.active_runs || []) {
+            handleLiveEvent({type: "agent_event", action: "working", task_id: run.task_id, timestamp: run.started_at});
+          }
+          return;
+        }
+        if (frame.type === "heartbeat") return;
+        const base = {task_id: frame.run_id, timestamp: frame.timestamp, seq: frame.seq};
+        if (frame.type === "run_started") handleLiveEvent({...base, type: "agent_event", action: "working"});
+        else if (frame.type === "tool_event") handleLiveEvent({...base, type: "tool_event", ...data});
+        else if (frame.type === "policy_denied") addLiveEvent({event: "Policy decision", status: "denied", detail: data.policy_reason_code || "permission_denied", timestamp: frame.timestamp});
+        else if (frame.type === "run_result") handleLiveEvent({...base, type: "task_update", status: data.status === "success" ? "done" : "failed", tool_events: data.tool_events, trace_written: data.trace_written});
+      }
       function liveUrl() {
         const url = new URL(backend);
         url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-        url.pathname = "/ws";
+        url.pathname = "/v1/events";
         url.search = "";
         return url.href;
       }
@@ -231,7 +245,7 @@
         };
         socket.onmessage = (message) => {
           if (liveSocket !== socket) return;
-          try { handleLiveEvent(JSON.parse(message.data)); }
+          try { handleLiveFrame(JSON.parse(message.data)); }
           catch { /* Ignore malformed server events; the REST path remains available. */ }
         };
         socket.onclose = () => {
@@ -254,7 +268,7 @@
         if (!list.length) {
           const empty = document.createElement("div");
           empty.className = "empty-events";
-          empty.textContent = "No tool or model events were returned for this response.";
+          empty.textContent = "No execution events were reported for this response.";
           host.append(empty);
           return;
         }
@@ -397,4 +411,5 @@
   </script>
 </body>
 </html>
+
 
