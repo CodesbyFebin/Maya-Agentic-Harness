@@ -221,7 +221,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
   <div class="stat"><span class="label">VOICE</span><span class="val" id="voice-status">TEXT READY</span></div>
   <div class="stat"><span class="dot"></span><span class="label">TOOLS</span><span class="val" id="tool-count">—</span></div>
   <div class="stat"><span class="dot"></span><span class="label">RUN</span><span class="val" id="run-bottom">IDLE</span></div>
-  <div class="stat" style="margin-left:auto"><span class="label">TRACE</span><span class="val" id="trace-bottom">UNVERIFIED LOG</span></div>
+  <div class="stat" style="margin-left:auto"><span class="label">TRACE</span><span class="val" id="trace-bottom">EVIDENCE.V1</span></div>
 </div>
 <div id="center-label"><div class="main">MAYA</div><div class="sub">LOCAL-FIRST · EVIDENCE-FIRST AGENT RUNTIME</div><div class="state" id="state-text">AWAITING OPERATOR INPUT</div></div>
 <div id="thought-stream"><div class="ts-label">◆ LIVE EXECUTION FEED</div><div id="ts-content"><div class="ts-step">› Waiting for a connected backend.</div></div></div>
@@ -233,14 +233,14 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
   <div class="readout-row"><span class="rl">RUN STATUS</span><span class="rv amber" id="r-status">IDLE</span></div>
   <div class="readout-row"><span class="rl">LIVE EVENTS</span><span class="rv" id="r-events">0</span></div>
   <div class="readout-row"><span class="rl">POLICY DENIALS</span><span class="rv amber" id="r-denials">0</span></div>
-  <div class="readout-row"><span class="rl">TRACE</span><span class="rv amber" id="r-trace">UNVERIFIED</span></div>
+  <div class="readout-row"><span class="rl">TRACE</span><span class="rv green" id="r-trace">HASH CHAIN</span></div>
 </div>
 <div id="left-readout">
   <div class="readout-row"><span class="rl">RUNTIME</span><span class="rv green" id="l-runtime">MAYA</span></div>
   <div class="readout-row"><span class="rl">MODE</span><span class="rv" id="l-mode">DISCONNECTED</span></div>
   <div class="readout-row"><span class="rl">TOOL POLICY</span><span class="rv green">ENFORCED</span></div>
   <div class="readout-row"><span class="rl">WRITE TOOL</span><span class="rv amber">DISABLED</span></div>
-  <div class="readout-row"><span class="rl">TRACE SCHEMA</span><span class="rv" id="l-schema">EXECUTION LOG</span></div>
+  <div class="readout-row"><span class="rl">TRACE SCHEMA</span><span class="rv" id="l-schema">EVIDENCE.V1</span></div>
   <div class="readout-row"><span class="rl">CONNECTION</span><span class="rv" id="l-connection">LOOPBACK</span></div>
 </div>
 <div class="widget clip-tl" id="w-models" style="top:42px;left:18px;width:230px"><div class="widget-header"><span class="w-title">MODEL ENDPOINT</span><span class="w-status" id="model-status">UNKNOWN</span><span class="w-btn" onclick="toggleWidget('w-models')">−</span></div><div class="widget-body" id="model-list"><div class="term-output">Connect a backend to inspect configured model metadata.</div></div></div>
@@ -249,7 +249,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
 <div class="widget" id="w-github" style="top:42px;right:260px;width:230px"><div class="widget-header"><span class="w-title">POLICY DECISIONS</span><span class="w-status" id="policy-count">0</span><span class="w-btn" onclick="toggleWidget('w-github')">−</span></div><div class="widget-body" id="github-list"><div class="term-output">No policy decisions in this session.</div></div></div>
 <div class="widget" id="w-tasks" style="top:230px;left:18px;width:230px"><div class="widget-header"><span class="w-title">REGISTERED TOOLS</span><span class="w-status" id="registered-tool-count">—</span><span class="w-btn" onclick="toggleWidget('w-tasks')">−</span></div><div class="widget-body" id="task-list"><div class="term-output">Tool registry will appear after health check.</div></div></div>
 <div class="widget" id="w-tradeauto" style="top:230px;right:18px;width:250px"><div class="widget-header"><span class="w-title">LIVE EVENT STREAM</span><span class="w-status" id="live-event-state">DISCONNECTED</span><span class="w-btn" onclick="toggleWidget('w-tradeauto')">−</span></div><div class="widget-body" id="tradeauto-body"><div class="term-output">No server events received.</div></div></div>
-<div class="widget clip-bl" id="w-approvals" style="bottom:42px;left:18px;width:270px"><div class="widget-header"><span class="w-title">EVIDENCE RECEIPT</span><span class="w-status" id="evidence-status">NO RUN</span><span class="w-btn" onclick="toggleWidget('w-approvals')">−</span></div><div class="widget-body" id="approval-list"><div class="term-output">No evidence receipt in this browser session.</div><div class="term-output">The configured backend reports its local execution log path and verification state.</div><div class="term-output" id="evidence-run">run_id: —</div><div class="term-output" id="evidence-path">trace: —</div></div></div>
+<div class="widget clip-bl" id="w-approvals" style="bottom:42px;left:18px;width:270px"><div class="widget-header"><span class="w-title">EVIDENCE RECEIPT</span><span class="w-status" id="evidence-status">NO RUN</span><span class="w-btn" onclick="toggleWidget('w-approvals')">−</span></div><div class="widget-body" id="approval-list"><div class="term-output">Recent backend traces (metadata only)</div><div class="term-output" id="evidence-run">run_id: —</div><div id="recent-evidence"><div class="term-output">Connect a backend to load recent traces.</div></div></div></div>
 <div class="widget clip-br" id="w-terminal" style="bottom:42px;right:18px;width:285px"><div class="widget-header"><span class="w-title">EXECUTION TIMELINE</span><span class="w-status" id="timeline-count">0 EVENTS</span><span class="w-btn" onclick="toggleWidget('w-terminal')">−</span></div><div class="widget-body" id="terminal-body"><div class="term-line"><span class="term-output">Waiting for AgentCore events…</span></div></div></div>
 <div id="operator-panel"><div class="op-title">MAYA // REQUEST TO LOCAL BACKEND</div><div id="conversation" aria-live="polite"><div class="chat-line">Configure your backend, then send a request.</div></div><form id="chat-form"><textarea id="prompt" rows="2" maxlength="20000" aria-label="Message MAYA" placeholder="Enter a request for the configured MAYA backend…"></textarea><button id="send-btn" type="submit">SEND ↗</button></form><div class="op-meta"><span id="run-hint">Requests and evidence stay on the backend machine.</span><span>SHIFT+ENTER FOR NEW LINE</span></div></div>
 <div id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div class="settings-card"><h2 id="settings-title">Backend connection</h2><p>Choose the HTTP backend base URL. The GitHub Pages preview stays disconnected until configured. For cross-origin use, allow this page origin in the backend CORS and WebSocket origin settings.</p><label for="backend-url">Backend base URL</label><input id="backend-url" type="url" spellcheck="false" placeholder="http://127.0.0.1:8001"><div class="settings-actions"><button id="settings-cancel" type="button">CANCEL</button><button id="settings-save" type="button">SAVE & CONNECT</button></div></div></div>
@@ -282,6 +282,16 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
     setText("backend-bottom", online ? "ONLINE" : "OFFLINE");
     $("backend-dot").className = "dot " + (online ? "" : "red");
   }
+  function showOffline(message) {
+    setConnection(message, false); setText("model-status", "UNAVAILABLE");
+    setText("l-mode", PAGES_SHOWCASE && !backend ? "SHOWCASE" : "OFFLINE");
+    setText("r-model", "—"); setText("r-endpoint", "—"); setText("l-connection", "—");
+    $("model-list").replaceChildren(); $("task-list").replaceChildren();
+    $("recent-evidence").replaceChildren();
+    for (const [id, text] of [["model-list", "Waiting for backend health data."], ["task-list", "Tool registry unavailable."], ["recent-evidence", "Evidence metadata unavailable."]]) {
+      const empty = document.createElement("div"); empty.className = "term-output"; empty.textContent = text; $(id).append(empty);
+    }
+  }
   function setStream(value, online) {
     setText("stream-bottom", value); setText("r-stream", value);
     setText("live-event-state", value); $("stream-dot").className = "dot " + (online ? "" : "amber");
@@ -291,9 +301,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
     setText("r-endpoint", data.endpoint_kind || "—");
     setText("l-mode", data.mode || "connected");
     setText("l-connection", data.endpoint_kind || "loopback");
-    setText("model-status", data.endpoint_kind ? "CONFIGURED" : "NOT PROBED");
-    setText("r-trace", data.trace_schema || "not reported");
-    setText("l-schema", data.trace_schema || "not reported");
+    setText("model-status", data.endpoint_kind ? data.endpoint_kind.toUpperCase() : "CONNECTED");
     const host = $("model-list"); host.replaceChildren();
     const rows = [["SERVICE", data.service], ["MODEL", data.model], ["ENDPOINT", data.endpoint_kind], ["TRACE SCHEMA", data.trace_schema || "not emitted by stub"], ["EVENT PROTOCOL", data.websocket_protocol || "unknown"]];
     for (const [name, value] of rows) {
@@ -313,16 +321,45 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
       row.append(name, tag); $("task-list").append(row);
     }
   }
+  function renderEvidence(payload) {
+    const host = $("recent-evidence"); host.replaceChildren();
+    const records = Array.isArray(payload?.records) ? payload.records.slice(0, 10) : [];
+    if (!records.length) {
+      const empty = document.createElement("div"); empty.className = "term-output";
+      empty.textContent = "No evidence traces are available yet."; host.append(empty); return;
+    }
+    for (const record of records) {
+      const row = document.createElement("div"); row.className = "term-output";
+      const when = typeof record.timestamp === "string" ? record.timestamp.replace("T", " ").slice(0, 19) : "time unknown";
+      const verification = record.verification === "verified" ? "CHAIN VERIFIED" : record.verification === "legacy-unverified" ? "LEGACY · UNVERIFIED" : "CHAIN INVALID";
+      row.textContent = `${when} · ${String(record.status || "unknown").toUpperCase()} · ${verification}`;
+      const detail = document.createElement("div"); detail.className = "term-output";
+      detail.textContent = `${String(record.run_id || "run unknown").slice(0, 40)} · ${String(record.model || "model unknown")} · ${String(record.step_count ?? 0)} steps`;
+      host.append(row, detail);
+    }
+  }
+  async function refreshEvidence() {
+    if (!backend) return;
+    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 3500);
+    try {
+      const response = await fetch(backend + "/v1/evidence/recent", {signal: abort.signal, cache: "no-store"});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      renderEvidence(await response.json());
+    } catch {
+      const host = $("recent-evidence"); host.replaceChildren();
+      const error = document.createElement("div"); error.className = "term-output"; error.textContent = "Evidence metadata unavailable."; host.append(error);
+    } finally { clearTimeout(timer); }
+  }
   async function checkHealth() {
-    if (!backend) { setConnection("SHOWCASE · NOT CONNECTED", false); setText("l-mode", "SHOWCASE"); return; }
+    if (!backend) { showOffline(PAGES_SHOWCASE ? "SHOWCASE · NOT CONNECTED" : "BACKEND NOT CONFIGURED"); return; }
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 3500);
     try {
       const response = await fetch(backend + "/health", {signal: abort.signal, cache: "no-store"});
       if (!response.ok) throw new Error("HTTP " + response.status);
       const data = await response.json();
       if (data.status !== "ok") throw new Error("Backend is not ready");
-      showEndpoint(data); setConnection("BACKEND ONLINE", true); addFeed("Health check passed · " + String(data.service || "MAYA backend"));
-    } catch (error) { setConnection("BACKEND OFFLINE", false); setText("model-status", "UNAVAILABLE"); setText("l-mode", error.name === "AbortError" ? "HEALTH TIMEOUT" : "OFFLINE"); }
+      showEndpoint(data); setConnection("BACKEND ONLINE", true); await refreshEvidence();
+    } catch (error) { showOffline(error.name === "AbortError" ? "BACKEND TIMEOUT" : "BACKEND OFFLINE"); }
     finally { clearTimeout(timer); }
   }
   function safeEvent(event) {
@@ -331,8 +368,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
     for (const key of allowed) if (event && event[key] !== undefined) {
       const value = event[key];
       if (key === "error" && value && typeof value === "object") result.error = value.code || value.type || "tool error";
-      else if (typeof value === "boolean" || typeof value === "number") result[key] = value;
-      else if (typeof value === "string") result[key] = value.slice(0, 240);
+      else if (["string", "number", "boolean"].includes(typeof value)) result[key] = String(value).slice(0, 240);
     }
     return result;
   }
@@ -371,9 +407,9 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
     } else if (frame.type === "run_result") {
       setText("run-bottom", event.status || "COMPLETE"); setText("r-status", event.status || "COMPLETE");
       setText("agent-status", event.status || "COMPLETE"); setText("state-text", "RUN " + String(event.status || "COMPLETE").toUpperCase());
-      setText("evidence-status", event.trace_written ? "LOG WRITTEN · UNVERIFIED" : "NO TRACE");
-      setText("r-trace", event.trace_written ? "UNVERIFIED" : "NO TRACE");
-      setText("trace-bottom", event.trace_written ? "UNVERIFIED" : "NO TRACE");
+      setText("evidence-status", event.trace_written ? "TRACE WRITTEN" : event.status === "stub" ? "STUB · NO TRACE" : "RUN COMPLETE");
+      setText("r-trace", event.trace_written ? "WRITTEN" : "NO TRACE");
+      refreshEvidence();
     }
     if (frame.type === "policy_denied" || event.decision === "deny") denialCount++;
     eventBuffer.push({...event, event_type: event.event_type || frame.type});
@@ -392,18 +428,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
     const current = new WebSocket(endpoint.href); socket = current;
     current.onopen = () => { reconnectDelay = 1000; setStream("CONNECTED", true); };
     current.onmessage = (message) => {
-      try {
-        const frame = JSON.parse(message.data);
-        if (frame.protocol !== "maya.events.v1") return;
-        if (frame.type === "hello") {
-          showEndpoint(frame.data || {});
-          setConnection("BACKEND LIVE", true);
-          setStream("LIVE · V1", true);
-          for (const run of frame.data?.active_runs || []) onEvent({type:"run_started",run_id:run.task_id,timestamp:run.started_at,data:{status:"running"}});
-          return;
-        }
-        if (frame.type !== "heartbeat") onEvent(frame);
-      }
+      try { const frame = JSON.parse(message.data); if (frame.protocol !== "maya.events.v1") return; if (frame.type === "hello") { setStream("LIVE · V1", true); return; } if (frame.type !== "heartbeat") onEvent(frame); }
       catch { /* ignore malformed frames and keep the stream alive */ }
     };
     current.onerror = () => current.close();
@@ -431,7 +456,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
       const maya = payload.maya || {};
       if (maya.run_id) { setText("r-run", maya.run_id); setText("evidence-run", "run_id: " + maya.run_id); }
       if (maya.status) { setText("run-bottom", maya.status); setText("r-status", maya.status); }
-      if (maya.log_path) { setText("evidence-path", "trace: " + maya.log_path); setText("evidence-status", "LOG WRITTEN · UNVERIFIED"); setText("r-trace", "UNVERIFIED"); setText("trace-bottom", "UNVERIFIED"); }
+      if (maya.log_path) { setText("evidence-status", "TRACE WRITTEN"); setText("r-trace", "WRITTEN"); refreshEvidence(); }
       const answer = payload.choices?.[0]?.message?.content ?? "Backend returned no response content."; addChat("assistant", answer);
       if (Array.isArray(maya.tool_events) && eventBuffer.length === 0) {
         eventBuffer = maya.tool_events.slice(-MAX_EVENTS).map((item) => safeEvent(item)); renderEvents();
@@ -472,7 +497,7 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
   }
   function openSettings() { $("backend-url").value = backend; $("settings").classList.add("open"); $("backend-url").focus(); }
   try { const saved = localStorage.getItem(BACKEND_KEY); if (saved) backend = safeBackend(saved); } catch { /* use default */ }
-  restoreHistory(); setupVoice(); initVisuals(); updateClock(); setInterval(updateClock,1000); checkHealth(); connectEvents(); setInterval(() => { if (socket?.readyState !== WebSocket.OPEN) checkHealth(); },30000);
+  restoreHistory(); setupVoice(); initVisuals(); updateClock(); setInterval(updateClock,1000); checkHealth(); connectEvents(); setInterval(checkHealth,30000);
   $("settings-open").addEventListener("click",openSettings);
   $("settings-cancel").addEventListener("click",() => $("settings").classList.remove("open"));
   $("settings").addEventListener("click",(event) => { if(event.target === $("settings")) $("settings").classList.remove("open"); });
@@ -488,4 +513,3 @@ html,body{overflow:auto;min-height:100%;height:100%;font-family:ui-monospace,SFM
 </script>
 </body>
 </html>
-
