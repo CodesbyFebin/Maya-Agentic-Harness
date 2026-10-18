@@ -246,7 +246,9 @@ async def chat_completions(request: ChatRequest) -> dict[str, Any]:
     loop = asyncio.get_running_loop()
 
     def emit_from_worker(event: dict[str, Any]) -> None:
-        loop.call_soon_threadsafe(lambda: asyncio.create_task(event_hub.publish(event)))
+        # Wait for the bounded fan-out before the worker continues so event order
+        # is preserved ahead of the completion event.
+        asyncio.run_coroutine_threadsafe(event_hub.publish(event), loop).result()
 
     active_runs[run_id] = {"task_id": run_id, "status": "running", "started_at": datetime.now(timezone.utc).isoformat()}
     await event_hub.publish({"type": "agent_event", "action": "working", "agent": "MAYA agent loop", "task_id": run_id, "task_description": "Agent request"})
