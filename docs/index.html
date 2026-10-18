@@ -132,6 +132,7 @@
           const response = await fetch(`${backend}/health`, {signal: controller.signal, cache: "no-store"});
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
+          if (liveSocket?.readyState === WebSocket.OPEN) return;
           const healthy = data.status === "ok";
           dot.className = `dot ${healthy ? "online" : "offline"}`;
           $("status-text").textContent = healthy ? "BACKEND ONLINE" : "BACKEND NOT READY";
