@@ -357,7 +357,7 @@ async def versioned_live_events(websocket: WebSocket) -> None:
                     try:
                         incoming = json.loads(message["text"])
                     except json.JSONDecodeError:
-                        continue
+                        incoming = None
                     if isinstance(incoming, dict) and incoming.get("type") == "ping":
                         await websocket.send_json({
                             "protocol": EVENT_PROTOCOL,
